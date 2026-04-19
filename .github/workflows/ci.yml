@@ -60,4 +60,6 @@ jobs:
         run: npm run test
 
       - name: Build
+        env:
+          NEXT_PUBLIC_SITE_URL: ${{ vars.NEXT_PUBLIC_SITE_URL || 'https://ci.invalid' }}
         run: npm run build
