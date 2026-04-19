@@ -1,6 +1,6 @@
 ---
 date: 2026-04-19
-status: draft
+status: implemented
 ---
 
 # CI — Lint, Typecheck, Test, Build on PRs to `main`
