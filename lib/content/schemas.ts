@@ -28,6 +28,10 @@ export type BlogFrontmatter = z.infer<typeof blogFrontmatterSchema>;
 
 export interface BlogPost extends BlogFrontmatter {
   slug: string;
+  /**
+   * Raw MDX source. Server-only — pass through `renderMdx` at the page
+   * boundary; do not hand the string to a client component.
+   */
   body: string;
   filePath: string;
 }
