@@ -1,0 +1,9 @@
+- id: duke-bse
+  institution: Duke University
+  degree: B.S.E. Mechanical Engineering
+  minor: Mathematics
+  gpa: "3.93/4.00"
+  honors: [Angier B. Duke Scholar]
+  start: "2022-08"
+  end: "2026-05"
+  map_pin_ids: [durham]

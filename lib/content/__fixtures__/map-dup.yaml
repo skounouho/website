@@ -1,0 +1,10 @@
+- id: x
+  name: A
+  kind: worked
+  lat: 0
+  lon: 0
+- id: x
+  name: B
+  kind: visited
+  lat: 1
+  lon: 1

@@ -1,0 +1,11 @@
+- id: nyc
+  name: New York City
+  kind: worked
+  lat: 40.7128
+  lon: -74.0060
+  blog_slugs: [hello]
+- id: durham
+  name: Durham
+  kind: lived
+  lat: 35.9940
+  lon: -78.8986

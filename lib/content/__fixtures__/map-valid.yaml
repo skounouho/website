@@ -1,0 +1,18 @@
+- id: nyc
+  name: New York City
+  kind: worked
+  lat: 40.7128
+  lon: -74.0060
+  start: "2026-01"
+  end: null
+  description: |
+    Working at Akara Markets.
+  blog_slugs: []
+  links:
+    - label: Akara Markets
+      url: https://akaramarkets.com
+- id: durham
+  name: Durham
+  kind: lived
+  lat: 35.9940
+  lon: -78.8986
