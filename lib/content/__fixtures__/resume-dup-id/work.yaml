@@ -1,0 +1,14 @@
+- id: dup
+  org: A
+  role: X
+  location: L
+  start: "2026-01"
+  end: null
+  highlights: [h]
+- id: dup
+  org: B
+  role: Y
+  location: M
+  start: "2026-02"
+  end: null
+  highlights: [h2]
