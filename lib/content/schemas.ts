@@ -92,14 +92,18 @@ export const publicationSchema = z
     title: z.string().min(1),
     authors: z.array(z.string().min(1)).min(1),
     venue: z.string().min(1),
-    year: z.number().int().min(1900).max(2100),
+    year: z.number().int().min(1900).max(2100).optional(),
     kind: publicationKind,
     status: publicationStatus,
     doi: z.string().optional(),
     url: urlOrNull.optional(),
     blog_slugs: z.array(kebabCase).default([]),
   })
-  .strict();
+  .strict()
+  .refine((v) => v.status === "in-review" || v.year !== undefined, {
+    message: "year is required when status is not in-review",
+    path: ["year"],
+  });
 
 export type Publication = z.infer<typeof publicationSchema>;
 

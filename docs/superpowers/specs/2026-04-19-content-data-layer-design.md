@@ -156,7 +156,7 @@ Slug derivation: filename `2026-03-15-on-jazz.mdx` → slug `on-jazz`.
 | `title` | string | yes | |
 | `authors` | string[] | yes | At least one. |
 | `venue` | string | yes | Journal, conference, or workshop name. |
-| `year` | integer | yes | |
+| `year` | integer | no | Required when `status` is `published` or `accepted`; optional for `in-review`. |
 | `kind` | enum | yes | `journal \| preprint \| presentation` |
 | `status` | enum | yes | `published \| in-review \| accepted` |
 | `doi` | string | no | Canonical DOI if available. |

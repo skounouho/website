@@ -39,7 +39,7 @@
     - "Built and validated a novel sensitivity-analysis framework for evaluating model-choice impact in dynamical systems."
     - "Presented previous and ongoing research at two international conferences (WCCM 2024 and USNCCM 2025)."
   blog_slugs: []
-  map_pin_ids: [durham, vancouver, chicago]
+  map_pin_ids: [durham]
 
 - id: sandia-cint-2024
   org: Sandia National Laboratories — Center for Integrated Nanotechnologies
@@ -74,7 +74,7 @@
   start: "2025-08"
   end: "2025-12"
   highlights:
-    - "Co-designed and co-taught a student-led house course introducing energy and climate investing."
+    - "Student co-instructor for a house course on energy and climate investing."
   blog_slugs: []
   map_pin_ids: [durham]
 
@@ -130,6 +130,6 @@
   end: "2023-05"
   org_url: https://www.dukechronicle.com
   highlights:
-    - "Senior reporter for The Chronicle, Duke University's independent student newspaper."
+    - "Senior Reporter for The Chronicle, Duke University's student newspaper."
   blog_slugs: []
   map_pin_ids: [durham]

@@ -122,6 +122,20 @@ describe("publicationSchema", () => {
       publicationSchema.parse({ ...base, authors: [] }),
     ).toThrow();
   });
+  it("allows year to be omitted when status is in-review", () => {
+    const { year: _year, ...rest } = base;
+    void _year;
+    expect(() =>
+      publicationSchema.parse({ ...rest, status: "in-review" }),
+    ).not.toThrow();
+  });
+  it("requires year when status is published", () => {
+    const { year: _year, ...rest } = base;
+    void _year;
+    expect(() =>
+      publicationSchema.parse({ ...rest, status: "published" }),
+    ).toThrow(/year/);
+  });
 });
 
 describe("mapPinSchema", () => {
