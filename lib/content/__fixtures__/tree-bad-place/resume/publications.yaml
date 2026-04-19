@@ -1,0 +1,8 @@
+- id: cma-2024
+  title: "A paper"
+  authors: [Senou]
+  venue: CMA
+  year: 2024
+  kind: journal
+  status: published
+  blog_slugs: [hello]

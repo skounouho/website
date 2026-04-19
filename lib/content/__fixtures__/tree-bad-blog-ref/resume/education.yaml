@@ -1,0 +1,6 @@
+- id: duke-bse
+  institution: Duke
+  degree: BSE
+  start: "2022-08"
+  end: "2026-05"
+  map_pin_ids: [durham]

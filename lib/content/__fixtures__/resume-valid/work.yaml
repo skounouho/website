@@ -1,0 +1,10 @@
+- id: akara
+  org: Akara Markets
+  role: Head of Product
+  location: New York City, NY
+  start: "2026-01"
+  end: null
+  highlights:
+    - Shipped v1 of the trading UI.
+  blog_slugs: []
+  map_pin_ids: [nyc]
