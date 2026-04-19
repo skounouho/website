@@ -143,7 +143,7 @@ Slug derivation: filename `2026-03-15-on-jazz.mdx` → slug `on-jazz`.
   authors: ["Senou Kounouho", "..."]
   venue: Computer Methods in Applied Mechanics and Engineering
   year: 2024
-  kind: journal            # journal | preprint | conference | talk | poster
+  kind: journal            # journal | preprint | presentation
   status: published        # published | in-review | accepted
   doi: 10.1016/j.cma.2024.117323
   url: null
@@ -157,7 +157,7 @@ Slug derivation: filename `2026-03-15-on-jazz.mdx` → slug `on-jazz`.
 | `authors` | string[] | yes | At least one. |
 | `venue` | string | yes | Journal, conference, or workshop name. |
 | `year` | integer | yes | |
-| `kind` | enum | yes | `journal \| preprint \| conference \| talk \| poster` |
+| `kind` | enum | yes | `journal \| preprint \| presentation` |
 | `status` | enum | yes | `published \| in-review \| accepted` |
 | `doi` | string | no | Canonical DOI if available. |
 | `url` | url \| null | no | Fallback link if no DOI. |
