@@ -1,4 +1,8 @@
 import type { Metadata } from "next";
+import "@fontsource-variable/alegreya";
+import "@fontsource-variable/alegreya/wght-italic.css";
+import "@fontsource/lato/400.css";
+import "@fontsource/lato/700.css";
 import "./globals.css";
 
 export const metadata: Metadata = {
