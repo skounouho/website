@@ -1,26 +1,181 @@
 @import "tailwindcss";
-
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@import "./theme.css";
+@import "katex/dist/katex.min.css";
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-serif: "Alegreya Variable", Georgia, serif;
-  --font-sans: "Lato", system-ui, sans-serif;
+  --color-bg: var(--bg);
+  --color-fg: var(--fg);
+  --color-fg-muted: var(--fg-muted);
+  --color-border: var(--border);
+  --color-accent: var(--accent);
+  --font-serif: var(--font-serif);
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-serif);
+  font-size: 18px;
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+  color-scheme: light;
+}
+
+html[data-theme="dark"] {
+  color-scheme: dark;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
+  background: var(--bg);
+  color: var(--fg);
+}
+
+*,
+*::before,
+*::after {
+  border-color: var(--border);
+}
+
+:focus {
+  outline: none;
+}
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+a {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+  transition: color var(--duration-fast) var(--ease-standard);
+}
+a:hover {
+  color: var(--accent);
+}
+
+/* KaTeX follows theme */
+.katex,
+.katex * {
+  color: inherit !important;
+}
+
+/* Shiki dual-theme: default light, override to dark via data-theme */
+.shiki,
+.shiki span {
+  color: var(--shiki-light);
+  background-color: var(--shiki-light-bg);
+}
+html[data-theme="dark"] .shiki,
+html[data-theme="dark"] .shiki span {
+  color: var(--shiki-dark);
+  background-color: var(--shiki-dark-bg);
+}
+
+/* Prose — MDX body styling. Applied to the article wrapper. */
+.prose-site {
   font-family: var(--font-serif);
+  color: var(--fg);
+}
+.prose-site h1 {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 40px;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  margin: 0 0 1.25rem;
+}
+.prose-site h2 {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 28px;
+  line-height: 1.25;
+  margin: 2.5rem 0 1rem;
+}
+.prose-site h3 {
+  font-family: var(--font-sans);
+  font-weight: 500;
+  font-size: 22px;
+  line-height: 1.3;
+  margin: 2rem 0 0.75rem;
+}
+.prose-site p {
+  margin: 1rem 0;
+}
+.prose-site ul,
+.prose-site ol {
+  margin: 1rem 0;
+  padding-left: 1.5rem;
+}
+.prose-site ul {
+  list-style: disc;
+}
+.prose-site ol {
+  list-style: decimal;
+}
+.prose-site li {
+  margin: 0.25rem 0;
+}
+.prose-site hr {
+  border: 0;
+  border-top: 1px solid var(--border);
+  margin: 3rem 0;
+}
+.prose-site table {
+  width: 100%;
+  margin: 1.5rem 0;
+  border-collapse: collapse;
+  font-size: 0.95em;
+}
+.prose-site th,
+.prose-site td {
+  padding: 0.5rem 0.75rem;
+  border-top: 1px solid var(--border);
+  text-align: left;
+}
+.prose-site th {
+  font-family: var(--font-sans);
+  font-weight: 700;
+}
+.prose-site strong {
+  font-weight: 700;
+}
+.prose-site em {
+  font-style: italic;
+}
+/* Footnotes (GFM) */
+.prose-site section.footnotes {
+  margin-top: 4rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border);
+  font-size: 0.95em;
+}
+
+/* View Transitions: opacity-only cross-fade */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: var(--duration-slow);
+  animation-timing-function: var(--ease-standard);
+}
+::view-transition-old(root) {
+  animation-name: vt-fade-out;
+}
+::view-transition-new(root) {
+  animation-name: vt-fade-in;
+}
+@keyframes vt-fade-out {
+  from { opacity: 1; } to { opacity: 0; }
+}
+@keyframes vt-fade-in {
+  from { opacity: 0; } to { opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none;
+  }
 }

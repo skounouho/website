@@ -1,0 +1,41 @@
+/*
+ * Single source of truth for design tokens.
+ * Tokens are CSS custom properties on <html>, scoped by data-theme,
+ * and re-exported to Tailwind v4 via @theme below.
+ */
+
+:root,
+[data-theme="light"] {
+  --bg: #f5f2ee;
+  --fg: #1a1a1a;
+  --fg-muted: #6b6660;
+  --border: #e3ded6;
+  --accent: #8a6f4f;
+
+  --font-serif: "Alegreya Variable", Georgia, serif;
+  --font-sans: "Lato", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
+
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --duration-fast: 120ms;
+  --duration-medium: 220ms;
+  --duration-slow: 400ms;
+}
+
+[data-theme="dark"] {
+  --bg: #1c1c1c;
+  --fg: #ede8e0;
+  --fg-muted: #8f8a82;
+  --border: #2e2a26;
+  --accent: #b8986e;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root,
+  [data-theme="light"],
+  [data-theme="dark"] {
+    --duration-fast: 0ms;
+    --duration-medium: 0ms;
+    --duration-slow: 0ms;
+  }
+}

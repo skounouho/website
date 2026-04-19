@@ -1,4 +1,6 @@
 import { loadAll, type AllContent } from "./load";
+import { loadAbout, type AboutPage } from "./load-about";
+import { contentPaths } from "./paths";
 
 export type {
   BlogPost,
@@ -7,6 +9,7 @@ export type {
   Publication,
   MapPin,
 } from "./schemas";
+export type { AboutPage } from "./load-about";
 
 interface Config {
   contentRoot?: string;
@@ -29,6 +32,7 @@ export function configureContent(next: Partial<Config>): void {
 export function _resetContentForTests(): void {
   config = defaultConfig();
   cached = null;
+  cachedAbout = null;
 }
 
 function all(): AllContent {
@@ -62,4 +66,12 @@ export function getPins() {
 
 export function getPin(id: string) {
   return all().pins.find((p) => p.id === id) ?? null;
+}
+
+let cachedAbout: AboutPage | null = null;
+export function getAboutPage(): AboutPage {
+  if (!cachedAbout) {
+    cachedAbout = loadAbout(contentPaths(config.contentRoot).about);
+  }
+  return cachedAbout;
 }
