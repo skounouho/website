@@ -27,6 +27,7 @@ content/
     work.yaml
     education.yaml
     publications.yaml
+    service.yaml
   map.yaml
   about.mdx
 ```
@@ -143,7 +144,7 @@ Slug derivation: filename `2026-03-15-on-jazz.mdx` → slug `on-jazz`.
   authors: ["Senou Kounouho", "..."]
   venue: Computer Methods in Applied Mechanics and Engineering
   year: 2024
-  kind: journal            # journal | preprint | conference | talk | poster
+  kind: journal            # journal | preprint | presentation
   status: published        # published | in-review | accepted
   doi: 10.1016/j.cma.2024.117323
   url: null
@@ -156,12 +157,38 @@ Slug derivation: filename `2026-03-15-on-jazz.mdx` → slug `on-jazz`.
 | `title` | string | yes | |
 | `authors` | string[] | yes | At least one. |
 | `venue` | string | yes | Journal, conference, or workshop name. |
-| `year` | integer | yes | |
-| `kind` | enum | yes | `journal \| preprint \| conference \| talk \| poster` |
+| `year` | integer | no | Required when `status` is `published` or `accepted`; optional for `in-review`. |
+| `kind` | enum | yes | `journal \| preprint \| presentation` |
 | `status` | enum | yes | `published \| in-review \| accepted` |
 | `doi` | string | no | Canonical DOI if available. |
 | `url` | url \| null | no | Fallback link if no DOI. |
 | `blog_slugs` | string[] | no | |
+
+### `resume/service.yaml`
+
+```yaml
+- id: duke-crowell-copresident
+  org: Duke University — Crowell Quadrangle
+  role: Dormitory Co-President
+  location: Durham, NC
+  start: "2023-08"
+  end: "2024-05"
+  map_pin_ids: [durham]
+```
+
+Used for university / community service roles that don't belong in `work.yaml` (committees, residence-life positions, volunteering).
+
+| Field | Type | Required | Notes |
+|-------|------|----------|-------|
+| `id` | string | yes | Unique within the file. Kebab-case. |
+| `org` | string | yes | |
+| `role` | string | yes | |
+| `location` | string | yes | Human-readable. |
+| `start` | `YYYY-MM` | yes | |
+| `end` | `YYYY-MM` \| `null` | yes | `null` means ongoing. |
+| `description` | string | no | Single paragraph of context if needed. |
+| `blog_slugs` | string[] | no | Each must match a blog post slug. |
+| `map_pin_ids` | string[] | no | Each must match a pin `id`. |
 
 ## Map schema
 
@@ -217,8 +244,8 @@ Responsibilities:
 - Enforce uniqueness of `id` within each collection.
 - Resolve cross-references:
   - `blog.places[]` must match an id in `map.yaml`.
-  - `work.blog_slugs[]`, `publications.blog_slugs[]`, `map.blog_slugs[]` must match blog filenames.
-  - `work.map_pin_ids[]`, `education.map_pin_ids[]` must match pin ids.
+  - `work.blog_slugs[]`, `publications.blog_slugs[]`, `service.blog_slugs[]`, `map.blog_slugs[]` must match blog filenames.
+  - `work.map_pin_ids[]`, `education.map_pin_ids[]`, `service.map_pin_ids[]` must match pin ids.
 - Filter out `draft: true` posts in production builds.
 - Emit readable errors pointing at the offending file and field.
 
@@ -231,6 +258,7 @@ export function getBlogPost(slug: string): BlogPost | null;
 export function getWork(): WorkEntry[];
 export function getEducation(): EducationEntry[];
 export function getPublications(): Publication[];
+export function getService(): ServiceEntry[];
 export function getPins(): MapPin[];
 export function getPin(id: string): MapPin | null;
 ```

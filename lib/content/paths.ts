@@ -9,6 +9,7 @@ export interface ContentPaths {
     work: string;
     education: string;
     publications: string;
+    service: string;
   };
 }
 
@@ -23,6 +24,7 @@ export function contentPaths(root?: string): ContentPaths {
       work: path.join(r, "resume", "work.yaml"),
       education: path.join(r, "resume", "education.yaml"),
       publications: path.join(r, "resume", "publications.yaml"),
+      service: path.join(r, "resume", "service.yaml"),
     },
   };
 }

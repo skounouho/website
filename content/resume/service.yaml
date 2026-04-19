@@ -1,0 +1,23 @@
+- id: duke-crowell-copresident
+  org: Duke University — Crowell Quadrangle
+  role: Dormitory Co-President
+  location: Durham, NC
+  start: "2023-08"
+  end: "2024-05"
+  map_pin_ids: [durham]
+
+- id: duke-cegc-intern
+  org: Duke University — Center for Engineering in the Global Community
+  role: Intern
+  location: Durham, NC
+  start: "2024-01"
+  end: "2024-12"
+  map_pin_ids: [durham]
+
+- id: duke-pratt-dei-committee
+  org: Duke University — Pratt Diversity, Equity, and Inclusion Committee
+  role: Committee Member
+  location: Durham, NC
+  start: "2023-01"
+  end: "2023-12"
+  map_pin_ids: [durham]

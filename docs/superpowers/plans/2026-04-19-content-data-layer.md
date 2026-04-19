@@ -1,5 +1,7 @@
 # Content Data Layer Implementation Plan
 
+> **Status: historical.** This plan was written on 2026-04-19 and executed via PR #1 / #3. Some schema details here (e.g. the original `conference | talk | poster` publication kinds, required `year`, absence of `service.yaml`) have since been superseded. Treat this document as a snapshot of the original plan, not as current design truth — see the spec at `docs/superpowers/specs/2026-04-19-content-data-layer-design.md` for the up-to-date shape.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Build a typed, Git-authored content layer (blog MDX + resume/map YAML) that is validated at build time and exposed through a small typed API under `lib/content/`.
