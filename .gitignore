@@ -12,6 +12,7 @@
 
 # testing
 /coverage
+.vitest-cache/
 
 # next.js
 /.next/
@@ -35,6 +36,9 @@ yarn-error.log*
 
 # vercel
 .vercel
+
+# superpowers brainstorming workspace
+.superpowers/
 
 # typescript
 *.tsbuildinfo
