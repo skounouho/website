@@ -5,6 +5,7 @@ export type {
   WorkEntry,
   EducationEntry,
   Publication,
+  ServiceEntry,
   MapPin,
 } from "./schemas";
 
@@ -54,6 +55,10 @@ export function getEducation() {
 
 export function getPublications() {
   return all().publications;
+}
+
+export function getService() {
+  return all().service;
 }
 
 export function getPins() {

@@ -5,9 +5,11 @@ import {
   workEntrySchema,
   educationEntrySchema,
   publicationSchema,
+  serviceEntrySchema,
   type WorkEntry,
   type EducationEntry,
   type Publication,
+  type ServiceEntry,
 } from "./schemas";
 
 function loadCollection<T extends { id: string }>(
@@ -49,4 +51,8 @@ export function loadEducation(filePath: string): EducationEntry[] {
 
 export function loadPublications(filePath: string): Publication[] {
   return loadCollection(filePath, publicationSchema, "publication");
+}
+
+export function loadService(filePath: string): ServiceEntry[] {
+  return loadCollection(filePath, serviceEntrySchema, "service");
 }

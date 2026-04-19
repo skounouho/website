@@ -5,6 +5,7 @@ import {
   loadWork,
   loadEducation,
   loadPublications,
+  loadService,
 } from "./load-resume";
 import { ContentParseError } from "./parse-yaml";
 import type {
@@ -12,6 +13,7 @@ import type {
   WorkEntry,
   EducationEntry,
   Publication,
+  ServiceEntry,
   MapPin,
 } from "./schemas";
 
@@ -25,6 +27,7 @@ export interface AllContent {
   work: WorkEntry[];
   education: EducationEntry[];
   publications: Publication[];
+  service: ServiceEntry[];
   pins: MapPin[];
 }
 
@@ -39,6 +42,7 @@ export function loadAll({
   const work = loadWork(p.resume.work);
   const education = loadEducation(p.resume.education);
   const publications = loadPublications(p.resume.publications);
+  const service = loadService(p.resume.service);
 
   const pinIds = new Set(pins.map((x) => x.id));
   const publicSlugs = new Set(
@@ -80,10 +84,14 @@ export function loadAll({
   for (const pub of publications) {
     checkBlogRefs(p.resume.publications, pub.id, pub.blog_slugs);
   }
+  for (const s of service) {
+    checkPinRefs(p.resume.service, s.id, s.map_pin_ids);
+    checkBlogRefs(p.resume.service, s.id, s.blog_slugs);
+  }
   for (const pin of pins) {
     checkBlogRefs(p.map, pin.id, pin.blog_slugs);
   }
 
   const posts = includeDrafts ? allPosts : allPosts.filter((x) => !x.draft);
-  return { posts, work, education, publications, pins };
+  return { posts, work, education, publications, service, pins };
 }

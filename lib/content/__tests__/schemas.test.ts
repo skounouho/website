@@ -4,6 +4,7 @@ import {
   workEntrySchema,
   educationEntrySchema,
   publicationSchema,
+  serviceEntrySchema,
   mapPinSchema,
 } from "../schemas";
 
@@ -135,6 +136,28 @@ describe("publicationSchema", () => {
     expect(() =>
       publicationSchema.parse({ ...rest, status: "published" }),
     ).toThrow(/year/);
+  });
+});
+
+describe("serviceEntrySchema", () => {
+  const base = {
+    id: "duke-dei",
+    org: "Duke University",
+    role: "Committee Member",
+    location: "Durham, NC",
+    start: "2023-01",
+    end: "2023-12",
+  };
+
+  it("accepts minimal valid service entry", () => {
+    const r = serviceEntrySchema.parse(base);
+    expect(r.map_pin_ids).toEqual([]);
+    expect(r.blog_slugs).toEqual([]);
+  });
+  it("rejects end before start", () => {
+    expect(() =>
+      serviceEntrySchema.parse({ ...base, start: "2024-01", end: "2023-06" }),
+    ).toThrow(/end/);
   });
 });
 

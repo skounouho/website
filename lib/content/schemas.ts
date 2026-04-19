@@ -75,6 +75,20 @@ export const educationEntrySchema = yearMonthRange({
 
 export type EducationEntry = z.infer<typeof educationEntrySchema>;
 
+export const serviceEntrySchema = yearMonthRange({
+  id: kebabCase,
+  org: z.string().min(1),
+  role: z.string().min(1),
+  location: z.string().min(1),
+  start: yearMonth,
+  end: yearMonthOrNull,
+  description: z.string().optional(),
+  blog_slugs: z.array(kebabCase).default([]),
+  map_pin_ids: z.array(kebabCase).default([]),
+});
+
+export type ServiceEntry = z.infer<typeof serviceEntrySchema>;
+
 export const publicationKind = z.enum([
   "journal",
   "preprint",
