@@ -18,13 +18,8 @@ export function PublicationEntry({ entry }: { entry: Publication }) {
 
   return (
     <article className="space-y-1">
-      <div
-        className="text-sm"
-        style={{ fontFamily: "var(--font-serif)" }}
-      >
-        {entry.authors.join(", ")}
-      </div>
-      <div style={{ fontFamily: "var(--font-serif)" }}>
+      <div className="font-serif text-sm">{entry.authors.join(", ")}</div>
+      <div className="font-serif">
         {href ? (
           <a href={href} target="_blank" rel="noopener noreferrer">
             {title}
@@ -34,20 +29,19 @@ export function PublicationEntry({ entry }: { entry: Publication }) {
         )}
         {label ? (
           <span
-            className="ml-2 inline-block border px-1.5 py-0.5 align-middle text-[10px] uppercase tracking-wider"
+            className="font-sans ml-2 inline-block border px-1.5 py-0.5 align-middle text-[10px] uppercase tracking-wider"
             style={{
               borderColor: "var(--border)",
               color: "var(--fg-muted)",
-              fontFamily: "var(--font-sans)",
             }}
           >
-            [{label}]
+            {label}
           </span>
         ) : null}
       </div>
       <div
-        className="text-sm"
-        style={{ color: "var(--fg-muted)", fontFamily: "var(--font-serif)" }}
+        className="font-serif text-sm"
+        style={{ color: "var(--fg-muted)" }}
       >
         {entry.venue} ({entry.year})
       </div>

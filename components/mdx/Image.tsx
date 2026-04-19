@@ -29,8 +29,8 @@ export function MdxImage(props: Props) {
         sizes="(max-width: 768px) 100vw, 65ch"
       />
       <figcaption
-        className="mt-3 text-sm italic"
-        style={{ color: "var(--fg-muted)", fontFamily: "var(--font-serif)" }}
+        className="font-serif mt-3 text-sm italic"
+        style={{ color: "var(--fg-muted)" }}
       >
         {caption}
       </figcaption>

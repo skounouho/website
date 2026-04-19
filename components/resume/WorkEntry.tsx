@@ -20,16 +20,10 @@ export function WorkEntry({
 
   return (
     <article className="space-y-3">
-      <h3
-        className="text-[22px] font-medium leading-tight"
-        style={{ fontFamily: "var(--font-sans)" }}
-      >
+      <h3 className="font-sans text-[22px] font-medium leading-tight">
         {entry.role}
       </h3>
-      <div
-        className="text-sm"
-        style={{ color: "var(--fg-muted)", fontFamily: "var(--font-serif)" }}
-      >
+      <div className="font-serif text-sm" style={{ color: "var(--fg-muted)" }}>
         {entry.org_url ? (
           <a href={entry.org_url} target="_blank" rel="noopener noreferrer">
             {entry.org}
@@ -48,11 +42,8 @@ export function WorkEntry({
         ))}
       </ul>
       {(relatedPosts.length > 0 || relatedPins.length > 0) && (
-        <div
-          className="text-sm"
-          style={{ color: "var(--fg-muted)" }}
-        >
-          <span style={{ fontFamily: "var(--font-sans)" }}>Related: </span>
+        <div className="text-sm" style={{ color: "var(--fg-muted)" }}>
+          <span className="font-sans">Related: </span>
           {[
             ...relatedPosts.map((p) => (
               <Link key={`p-${p.slug}`} href={`/blog/${p.slug}`}>

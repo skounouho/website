@@ -10,29 +10,20 @@ export function PostListRow({ post }: { post: BlogPost }) {
         className="group flex flex-col gap-1 no-underline sm:flex-row sm:items-baseline sm:gap-6"
       >
         <span
-          className="shrink-0 text-sm"
-          style={{
-            color: "var(--fg-muted)",
-            fontFamily: "var(--font-serif)",
-          }}
+          className="font-serif shrink-0 text-sm"
+          style={{ color: "var(--fg-muted)" }}
         >
           {formatPostDate(post.date)}
           {post.draft ? (
             <span
-              className="ml-2 inline-block border px-1.5 py-0.5 text-[10px] uppercase tracking-wider"
-              style={{
-                borderColor: "var(--border)",
-                fontFamily: "var(--font-sans)",
-              }}
+              className="font-sans ml-2 inline-block border px-1.5 py-0.5 text-[10px] uppercase tracking-wider"
+              style={{ borderColor: "var(--border)" }}
             >
               Draft
             </span>
           ) : null}
         </span>
-        <span
-          className="text-[20px] transition-colors motion-safe:duration-[var(--duration-fast)] group-hover:text-[var(--accent)]"
-          style={{ fontFamily: "var(--font-serif)" }}
-        >
+        <span className="font-serif text-[20px] transition-colors motion-safe:duration-[var(--duration-fast)] group-hover:text-[var(--accent)]">
           {post.title}
         </span>
       </Link>

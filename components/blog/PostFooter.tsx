@@ -15,11 +15,10 @@ export function PostFooter({
           {post.tags.map((tag) => (
             <li
               key={tag}
-              className="border px-2 py-1 text-[11px] uppercase tracking-wider"
+              className="font-sans border px-2 py-1 text-[11px] uppercase tracking-wider"
               style={{
                 borderColor: "var(--border)",
                 color: "var(--fg-muted)",
-                fontFamily: "var(--font-sans)",
               }}
             >
               {tag}
@@ -30,16 +29,10 @@ export function PostFooter({
 
       {places.length > 0 ? (
         <div className="mb-8">
-          <h3
-            className="mb-2 text-[18px] font-medium"
-            style={{ fontFamily: "var(--font-sans)" }}
-          >
+          <h3 className="font-sans mb-2 text-[18px] font-medium">
             Places mentioned
           </h3>
-          <ul
-            className="flex flex-col gap-1"
-            style={{ fontFamily: "var(--font-serif)" }}
-          >
+          <ul className="font-serif flex flex-col gap-1">
             {places.map((pin) => (
               <li key={pin.id}>
                 <Link href={`/map#${pin.id}`}>{pin.name}</Link>
@@ -49,11 +42,7 @@ export function PostFooter({
         </div>
       ) : null}
 
-      <Link
-        href="/blog"
-        className="text-sm"
-        style={{ fontFamily: "var(--font-sans)" }}
-      >
+      <Link href="/blog" className="font-sans text-sm">
         ← Back to writing
       </Link>
     </footer>

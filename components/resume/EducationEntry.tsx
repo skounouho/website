@@ -11,28 +11,20 @@ export function EducationEntry({ entry }: { entry: Edu }) {
 
   return (
     <article className="grid grid-cols-[1fr_auto] items-baseline gap-x-6 gap-y-2">
-      <h3
-        className="text-[22px] font-medium leading-tight"
-        style={{ fontFamily: "var(--font-sans)" }}
-      >
+      <h3 className="font-sans text-[22px] font-medium leading-tight">
         {entry.degree}
       </h3>
       <div
-        className="text-right text-sm"
-        style={{ color: "var(--fg-muted)", fontFamily: "var(--font-serif)" }}
+        className="font-serif text-right text-sm"
+        style={{ color: "var(--fg-muted)" }}
       >
         {formatYearMonthRange(entry.start, entry.end)}
       </div>
-      <div
-        className="col-span-2"
-        style={{ fontFamily: "var(--font-serif)" }}
-      >
-        {entry.institution}
-      </div>
+      <div className="font-serif col-span-2">{entry.institution}</div>
       {meta.length > 0 ? (
         <div
-          className="col-span-2 text-sm"
-          style={{ color: "var(--fg-muted)", fontFamily: "var(--font-serif)" }}
+          className="font-serif col-span-2 text-sm"
+          style={{ color: "var(--fg-muted)" }}
         >
           {meta.join(" · ")}
         </div>

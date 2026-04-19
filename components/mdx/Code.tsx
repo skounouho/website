@@ -7,12 +7,8 @@ export function MdxPre({
   return (
     <pre
       {...rest}
-      className="my-6 overflow-x-auto rounded-[2px] border p-4 text-[0.9em]"
-      style={{
-        borderColor: "var(--border)",
-        background: "var(--bg)",
-        fontFamily: "var(--font-mono)",
-      }}
+      className="font-mono my-6 overflow-x-auto rounded-[2px] border p-4 text-[0.9em]"
+      style={{ borderColor: "var(--border)", background: "var(--bg)" }}
     >
       {children}
     </pre>
@@ -36,9 +32,8 @@ export function MdxCode({
   return (
     <code
       {...rest}
-      className="rounded-[2px] px-1 py-0.5 text-[0.9em]"
+      className="font-mono rounded-[2px] px-1 py-0.5 text-[0.9em]"
       style={{
-        fontFamily: "var(--font-mono)",
         background: "color-mix(in srgb, var(--border) 50%, transparent)",
       }}
     >

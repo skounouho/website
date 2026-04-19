@@ -29,10 +29,7 @@ export default function ResumePage() {
   return (
     <div className="mx-auto max-w-[70ch] px-6 py-24">
       <section>
-        <h2
-          className="mb-10 text-[28px] font-bold"
-          style={{ fontFamily: "var(--font-sans)" }}
-        >
+        <h2 className="font-sans mb-10 text-[28px] font-bold">
           Work
         </h2>
         <div className="space-y-10">
@@ -43,10 +40,7 @@ export default function ResumePage() {
       </section>
 
       <section className="mt-20">
-        <h2
-          className="mb-10 text-[28px] font-bold"
-          style={{ fontFamily: "var(--font-sans)" }}
-        >
+        <h2 className="font-sans mb-10 text-[28px] font-bold">
           Education
         </h2>
         <div className="space-y-10">
@@ -57,10 +51,7 @@ export default function ResumePage() {
       </section>
 
       <section className="mt-20">
-        <h2
-          className="mb-10 text-[28px] font-bold"
-          style={{ fontFamily: "var(--font-sans)" }}
-        >
+        <h2 className="font-sans mb-10 text-[28px] font-bold">
           Publications
         </h2>
         <div className="space-y-10">

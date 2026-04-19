@@ -4,29 +4,17 @@ import { formatPostDate } from "@/lib/format";
 export function PostHeader({ post }: { post: BlogPost }) {
   return (
     <header className="mb-10">
-      <div
-        className="text-sm"
-        style={{
-          color: "var(--fg-muted)",
-          fontFamily: "var(--font-serif)",
-        }}
-      >
+      <div className="font-serif text-sm" style={{ color: "var(--fg-muted)" }}>
         {formatPostDate(post.date)}
       </div>
       {post.updated ? (
-        <div
-          className="text-sm"
-          style={{
-            color: "var(--fg-muted)",
-            fontFamily: "var(--font-serif)",
-          }}
-        >
+        <div className="font-serif text-sm" style={{ color: "var(--fg-muted)" }}>
           Updated {formatPostDate(post.updated)}
         </div>
       ) : null}
       <h1
-        className="mt-3 text-[40px] font-bold leading-[1.15]"
-        style={{ fontFamily: "var(--font-sans)", color: "var(--fg)" }}
+        className="font-sans mt-3 text-[40px] font-bold leading-[1.15]"
+        style={{ color: "var(--fg)" }}
       >
         {post.title}
       </h1>

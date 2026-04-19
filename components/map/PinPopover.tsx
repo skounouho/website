@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef } from "react";
 import type { MapPin } from "@/lib/content";
 import { formatYearMonthRange } from "@/lib/format";
 
@@ -15,14 +14,8 @@ interface Props {
 }
 
 export function PinPopover({ pin, x, y, onClose }: Props) {
-  const ref = useRef<HTMLDivElement>(null);
   // Flip above/below based on vertical position within the map.
   const placement: "above" | "below" = y < 25 ? "below" : "above";
-
-  useEffect(() => {
-    const node = ref.current;
-    if (node) node.focus();
-  }, []);
 
   const headingId = `pin-${pin.id}-title`;
   const rangeText =
@@ -32,10 +25,8 @@ export function PinPopover({ pin, x, y, onClose }: Props) {
 
   return (
     <div
-      ref={ref}
-      role="dialog"
+      role="group"
       aria-labelledby={headingId}
-      tabIndex={-1}
       onClick={(e) => e.stopPropagation()}
       className="absolute z-10 w-[320px] max-w-[80vw] border p-5 shadow-sm"
       style={{
@@ -47,47 +38,33 @@ export function PinPopover({ pin, x, y, onClose }: Props) {
       }}
     >
       <div className="flex items-center gap-3">
-        <h3
-          id={headingId}
-          className="text-[20px] font-medium"
-          style={{ fontFamily: "var(--font-sans)" }}
-        >
+        <h3 id={headingId} className="font-sans text-[20px] font-medium">
           {pin.name}
         </h3>
         <span
-          className="border px-1.5 py-0.5 text-[10px] uppercase tracking-wider"
-          style={{
-            borderColor: "var(--border)",
-            color: "var(--fg-muted)",
-            fontFamily: "var(--font-sans)",
-          }}
+          className="font-sans border px-1.5 py-0.5 text-[10px] uppercase tracking-wider"
+          style={{ borderColor: "var(--border)", color: "var(--fg-muted)" }}
         >
           {pin.kind}
         </span>
       </div>
       {rangeText ? (
         <div
-          className="mt-1 text-sm"
-          style={{ color: "var(--fg-muted)", fontFamily: "var(--font-serif)" }}
+          className="font-serif mt-1 text-sm"
+          style={{ color: "var(--fg-muted)" }}
         >
           {rangeText}
         </div>
       ) : null}
       {pin.description ? (
-        <div
-          className="mt-3 space-y-2 text-[15px]"
-          style={{ fontFamily: "var(--font-serif)" }}
-        >
+        <div className="font-serif mt-3 space-y-2 text-[15px]">
           {pin.description.split(/\n{2,}/).map((para, i) => (
             <p key={i}>{para}</p>
           ))}
         </div>
       ) : null}
       {pin.links.length > 0 ? (
-        <ul
-          className="mt-3 flex flex-col gap-1 text-sm"
-          style={{ fontFamily: "var(--font-serif)" }}
-        >
+        <ul className="font-serif mt-3 flex flex-col gap-1 text-sm">
           {pin.links.map((l) => (
             <li key={l.url}>
               <a href={l.url} target="_blank" rel="noopener noreferrer">
@@ -99,16 +76,10 @@ export function PinPopover({ pin, x, y, onClose }: Props) {
       ) : null}
       {pin.blog_slugs.length > 0 ? (
         <div className="mt-4">
-          <h4
-            className="text-[16px] font-medium"
-            style={{ fontFamily: "var(--font-sans)" }}
-          >
+          <h4 className="font-sans text-[16px] font-medium">
             Related writing
           </h4>
-          <ul
-            className="mt-1 flex flex-col gap-1 text-sm"
-            style={{ fontFamily: "var(--font-serif)" }}
-          >
+          <ul className="font-serif mt-1 flex flex-col gap-1 text-sm">
             {pin.blog_slugs.map((slug) => (
               <li key={slug}>
                 <Link href={`/blog/${slug}`}>{slug}</Link>
@@ -121,11 +92,8 @@ export function PinPopover({ pin, x, y, onClose }: Props) {
         type="button"
         onClick={onClose}
         aria-label="Close"
-        className="absolute right-2 top-2 inline-flex h-6 w-6 items-center justify-center"
-        style={{
-          color: "var(--fg-muted)",
-          fontFamily: "var(--font-sans)",
-        }}
+        className="font-sans absolute right-2 top-2 inline-flex h-6 w-6 items-center justify-center"
+        style={{ color: "var(--fg-muted)" }}
       >
         ×
       </button>

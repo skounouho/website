@@ -9,15 +9,12 @@ export const MAP_HEIGHT = 500;
  * MAP_WIDTH × MAP_HEIGHT. Used for both country paths and pin positions
  * so pins land exactly on the map.
  */
-function makeProjection() {
-  return geoEqualEarth()
-    .scale(175)
-    .translate([MAP_WIDTH / 2, MAP_HEIGHT / 2]);
-}
+const projection = geoEqualEarth()
+  .scale(175)
+  .translate([MAP_WIDTH / 2, MAP_HEIGHT / 2]);
 
 export function projectPoint(lon: number, lat: number): [number, number] {
-  const p = makeProjection();
-  const xy = p([lon, lat]);
+  const xy = projection([lon, lat]);
   if (!xy) throw new Error(`Projection failed for (${lon}, ${lat})`);
   return [xy[0], xy[1]];
 }
@@ -25,7 +22,7 @@ export function projectPoint(lon: number, lat: number): [number, number] {
 export function countryPathsFromGeojson(
   fc: ExtendedFeatureCollection,
 ): string[] {
-  const path = geoPath(makeProjection());
+  const path = geoPath(projection);
   const out: string[] = [];
   for (const feature of fc.features) {
     const d = path(feature);

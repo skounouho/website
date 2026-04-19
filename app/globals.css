@@ -155,27 +155,6 @@ html[data-theme="dark"] .shiki span {
   font-size: 0.95em;
 }
 
-/* View Transitions: opacity-only cross-fade */
-::view-transition-old(root),
-::view-transition-new(root) {
-  animation-duration: var(--duration-slow);
-  animation-timing-function: var(--ease-standard);
-}
-::view-transition-old(root) {
-  animation-name: vt-fade-out;
-}
-::view-transition-new(root) {
-  animation-name: vt-fade-in;
-}
-@keyframes vt-fade-out {
-  from { opacity: 1; } to { opacity: 0; }
-}
-@keyframes vt-fade-in {
-  from { opacity: 0; } to { opacity: 1; }
-}
-@media (prefers-reduced-motion: reduce) {
-  ::view-transition-old(root),
-  ::view-transition-new(root) {
-    animation: none;
-  }
-}
+/* View Transitions: the `::view-transition-*` keyframes were removed
+ * alongside this PR because the Next 16 `<ViewTransition>` opt-in is not
+ * wired yet. Re-add (or use a router event) once the opt-in lands. */

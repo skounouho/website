@@ -12,6 +12,10 @@ import { mdxComponents } from "@/components/mdx";
  *   - Math ($…$ / $$…$$) via KaTeX
  *   - Dual-theme syntax highlighting via Shiki
  *   - Shared custom component overrides
+ *
+ * Trusted-author input only. `source` is evaluated as MDX (can execute
+ * arbitrary JSX/components) — do not pass user-submitted content here
+ * without a sandboxing layer.
  */
 export function renderMdx(source: string): ReactNode {
   return (

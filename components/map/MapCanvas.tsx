@@ -66,7 +66,7 @@ export function MapCanvas({
   return (
     <div
       ref={containerRef}
-      className="relative h-screen w-full overflow-hidden"
+      className="relative h-[calc(100vh-56px)] md:h-screen w-full overflow-hidden"
       onClick={(e) => {
         // Outside-click close: only if the click didn't land on a pin.
         if ((e.target as HTMLElement).closest("[data-pin]")) return;

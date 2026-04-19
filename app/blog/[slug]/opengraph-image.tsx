@@ -1,4 +1,6 @@
 import { ImageResponse } from "next/og";
+import { readFile } from "node:fs/promises";
+import { join } from "node:path";
 import { getBlogPost, getBlogPosts } from "@/lib/content";
 import { formatPostDate } from "@/lib/format";
 
@@ -20,6 +22,15 @@ export default async function OG(props: {
   const title = post?.title ?? "Senou Kounouho";
   const date = post ? formatPostDate(post.date) : "";
 
+  // Satori accepts TTF, OTF, and WOFF — NOT woff2. Load the static-weight
+  // .woff from @fontsource/alegreya (the variable package only ships woff2).
+  const alegreya = await readFile(
+    join(
+      process.cwd(),
+      "node_modules/@fontsource/alegreya/files/alegreya-latin-700-normal.woff",
+    ),
+  );
+
   return new ImageResponse(
     (
       <div
@@ -32,7 +43,7 @@ export default async function OG(props: {
           flexDirection: "column",
           justifyContent: "space-between",
           padding: 80,
-          fontFamily: "serif",
+          fontFamily: "Alegreya",
         }}
       >
         <div style={{ fontSize: 28, color: "#6B6660" }}>{date}</div>
@@ -42,6 +53,16 @@ export default async function OG(props: {
         <div style={{ fontSize: 24, color: "#6B6660" }}>Senou Kounouho</div>
       </div>
     ),
-    size,
+    {
+      ...size,
+      fonts: [
+        {
+          name: "Alegreya",
+          data: alegreya,
+          style: "normal",
+          weight: 700,
+        },
+      ],
+    },
   );
 }
