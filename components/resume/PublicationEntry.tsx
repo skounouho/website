@@ -43,7 +43,7 @@ export function PublicationEntry({ entry }: { entry: Publication }) {
         className="font-serif text-sm"
         style={{ color: "var(--fg-muted)" }}
       >
-        {entry.venue} ({entry.year})
+        {entry.venue}{entry.year !== undefined ? ` (${entry.year})` : ""}
       </div>
     </article>
   );

@@ -22,7 +22,9 @@ function byStartDesc<T extends { start: string }>(a: T, b: T): number {
 export default function ResumePage() {
   const work = [...getWork()].sort(byStartDesc);
   const education = [...getEducation()].sort(byStartDesc);
-  const publications = [...getPublications()].sort((a, b) => b.year - a.year);
+  const publications = [...getPublications()].sort(
+    (a, b) => (b.year ?? Infinity) - (a.year ?? Infinity),
+  );
   const posts = getBlogPosts();
   const pins = getPins();
 
