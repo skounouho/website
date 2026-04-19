@@ -6,19 +6,92 @@
   start: "2026-01"
   end: null
   description: |
-    Working at Akara Markets, building courtside intelligence
-    for sports prediction markets.
+    Technical co-founder and Head of Product at Akara Markets —
+    courtside intelligence for sports prediction markets.
   blog_slugs: []
   links:
     - label: Akara Markets
       url: https://akaramarkets.com
 
 - id: durham
-  name: Durham
+  name: Durham, NC
   kind: lived
   lat: 35.9940
   lon: -78.8986
   start: "2022-08"
   end: "2026-05"
   description: |
-    Duke University — undergraduate.
+    Duke University — B.S.E. in Mechanical Engineering. Undergraduate
+    research at the Uncertainty Quantification in Computational
+    Mechanics Lab under Prof. Johann Guilleminot, plus teaching across
+    MEMS and Computer Science.
+  blog_slugs: []
+
+- id: lemont
+  name: Lemont, IL
+  kind: research
+  lat: 41.6731
+  lon: -87.9798
+  start: "2025-05"
+  end: "2025-08"
+  description: |
+    Argonne National Laboratory — Thermal and Structural Materials
+    Modeling and Simulations group. Built COBRA, a simulation tool
+    for additive-manufacturing defect modeling released on DOE Code.
+  blog_slugs: []
+  links:
+    - label: COBRA on DOE Code
+      url: https://www.osti.gov/doecode/biblio/164797
+
+- id: albuquerque
+  name: Albuquerque, NM
+  kind: research
+  lat: 35.0844
+  lon: -106.6504
+  start: "2023-05"
+  end: "2024-08"
+  description: |
+    Two summers at Sandia National Laboratories' Center for
+    Integrated Nanotechnologies — reduced-order modeling for metals
+    in 2023, polymer gel network simulation with machine learning
+    in 2024.
+  blog_slugs: []
+
+- id: chicago
+  name: Chicago, IL
+  kind: conference
+  lat: 41.8781
+  lon: -87.6298
+  start: "2025-07"
+  end: "2025-07"
+  description: |
+    U.S. National Congress on Computational Mechanics 2025 —
+    presented "An adaptive stochastic solver to propagate
+    operator-form uncertainties in multi-model settings."
+  blog_slugs: []
+
+- id: vancouver
+  name: Vancouver, Canada
+  kind: conference
+  lat: 49.2827
+  lon: -123.1207
+  start: "2024-07"
+  end: "2024-07"
+  description: |
+    World Congress on Computational Mechanics 2024 — presented on
+    model-form uncertainties in molecular dynamics ensembles.
+    Finalist, UQ Student Paper Competition.
+  blog_slugs: []
+
+- id: raleigh
+  name: Raleigh, NC
+  kind: conference
+  lat: 35.7796
+  lon: -78.6382
+  start: "2025-08"
+  end: "2025-08"
+  description: |
+    Frontiers of Materials Science Engineering Undergraduate
+    Symposium at NC State — finalist (16 students). Presented on
+    CT-informed random porosity fields in additive manufacturing.
+  blog_slugs: []

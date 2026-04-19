@@ -1,10 +1,83 @@
-- id: cma-2024-phase-changes
-  title: "Uncertainty in atomic-level phase changes driven by model choice"
-  authors: ["Senou Kounouho"]
+- id: cmame-2024-stochastic-symplectic
+  title: "Stochastic symplectic reduced-order modeling for model-form uncertainty quantification in molecular dynamics simulations in various statistical ensembles"
+  authors: ["Senou Kounouho", "Rémi Dingreville", "Johann Guilleminot"]
   venue: Computer Methods in Applied Mechanics and Engineering
   year: 2024
   kind: journal
   status: published
   doi: 10.1016/j.cma.2024.117323
+  url: null
+  blog_slugs: []
+
+- id: cmame-2025-unified-sensitivity
+  title: "When model-form and parametric uncertainties matter: A unified stochastic representation for propagation and sensitivity analysis"
+  authors: ["Senou Kounouho", "Johann Guilleminot"]
+  venue: Computer Methods in Applied Mechanics and Engineering
+  year: 2025
+  kind: journal
+  status: published
+  doi: 10.1016/j.cma.2025.118618
+  url: null
+  blog_slugs: []
+
+- id: aes-2026-puma
+  title: "PUMA: A scalable framework for simulating powder post-processing in advanced manufacturing"
+  authors:
+    - "Hieu Tran"
+    - "Senou Kounouho"
+    - "M. Du"
+    - "F. Sultana"
+    - "Mark Messner"
+    - "Tianchen Hu"
+  venue: Advances in Engineering Software
+  year: 2026
+  kind: journal
+  status: in-review
+  url: null
+  blog_slugs: []
+
+- id: jctc-2026-polymer-mlrom
+  title: "Learning reduced-order structural representations of polymeric materials with machine learning"
+  authors:
+    - "Saaketh Desai"
+    - "M. Wilson"
+    - "S. Liu"
+    - "Senou Kounouho"
+    - "T. O'Connor"
+    - "Rémi Dingreville"
+  venue: Journal of Chemical Theory and Computation
+  year: 2026
+  kind: journal
+  status: in-review
+  url: null
+  blog_slugs: []
+
+- id: usnccm-2025-adaptive-stochastic
+  title: "An adaptive stochastic solver to propagate operator-form uncertainties in multi-model settings"
+  authors: ["Senou Kounouho"]
+  venue: U.S. National Congress on Computational Mechanics (USNCCM), Chicago, IL
+  year: 2025
+  kind: talk
+  status: published
+  url: null
+  blog_slugs: []
+
+- id: wccm-2024-model-form-md
+  title: "Model-form uncertainties in various molecular dynamics ensembles with stochastic reduced-order modeling"
+  authors: ["Senou Kounouho"]
+  venue: World Congress on Computational Mechanics & Pan American Congress on Computational Mechanics, Vancouver, Canada
+  year: 2024
+  kind: talk
+  status: published
+  url: null
+  blog_slugs: []
+
+- id: frontiers-2025-am-uq
+  title: "Quantifying uncertainty in additive manufacturing: liquid silicon infiltration using CT-informed random porosity fields"
+  authors: ["Senou Kounouho"]
+  venue: Frontiers of Materials Science Engineering Undergraduate Symposium, NC State, Raleigh, NC
+  year: 2025
+  kind: talk
+  status: published
   url: null
   blog_slugs: []

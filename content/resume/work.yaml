@@ -1,12 +1,135 @@
 - id: akara-markets
   org: Akara Markets
-  role: Head of Product
+  role: Technical Co-Founder & Head of Product
   location: New York City, NY
   start: "2026-01"
   end: null
   org_url: https://akaramarkets.com
   highlights:
-    - "Founding team of a start-up building courtside intelligence for sports prediction markets."
-    - "Built and iterated on web and iOS apps in React / React Native."
+    - "Co-founder of a startup delivering courtside intelligence for sports prediction markets and betting; co-own architecture, development, and deployment of web and iOS products from 0 to 1."
+    - "Built a shared-codebase React / React Native app (web + iOS) with a Python backend for real-time sports data ingestion and sub-second delivery under live-game latency requirements."
+    - "Built GitHub Actions CI/CD workflows running AI-assisted code review and a full E2E test suite."
+    - "Built a design-to-production pipeline (Google Stitch → v0 → Claude Code) automating the full loop from UI mockup to working frontend and backend code."
   blog_slugs: []
   map_pin_ids: [nyc]
+
+- id: argonne-cobra
+  org: Argonne National Laboratory
+  role: Junior Research Aide — Thermal and Structural Materials Modeling and Simulations
+  location: Lemont, IL
+  start: "2025-05"
+  end: "2025-08"
+  org_url: https://www.anl.gov
+  highlights:
+    - "Built and deployed COBRA, enabling Argonne researchers to model additive-manufacturing defects with limited experimental data — replacing a slow manual process."
+    - "Improved generation speed by over 100× compared to the research group's previous approach."
+    - "Scaled deployment to 980 massively-parallel simulations, delivering predictions for a manufactured part."
+    - "Co-authored a paper (in-review, Advances in Engineering Software) on simulating uncertainty in additive manufacturing."
+  blog_slugs: []
+  map_pin_ids: [lemont]
+
+- id: duke-uqcm-lab
+  org: Duke University — Uncertainty Quantification in Computational Mechanics Lab
+  role: Undergraduate Researcher (advisor Prof. Johann Guilleminot)
+  location: Durham, NC
+  start: "2022-09"
+  end: "2025-12"
+  highlights:
+    - "Developed novel computational methods for uncertainty quantification in atomic-level phase changes; published in a top-tier journal (CMAME, IF 7.3, 5 citations)."
+    - "Built and validated a novel sensitivity-analysis framework for evaluating model-choice impact in dynamical systems."
+    - "Presented previous and ongoing research at two international conferences (WCCM 2024 and USNCCM 2025)."
+  blog_slugs: []
+  map_pin_ids: [durham, vancouver, chicago]
+
+- id: sandia-cint-2024
+  org: Sandia National Laboratories — Center for Integrated Nanotechnologies
+  role: Summer Research Intern (advisors Dr. Rémi Dingreville and Dr. Saaketh Desai)
+  location: Albuquerque, NM
+  start: "2024-05"
+  end: "2024-08"
+  highlights:
+    - "Built a high-throughput simulation toolkit for polymer modeling and verification, handling thousands of parallel runs across diverse material systems."
+    - "Developed a novel principal-component-analysis method for polymer gel network simulation using Python and MATLAB."
+    - "Co-authored a paper (in-review, Journal of Chemical Theory and Computation) on machine learning in multi-fidelity polymer simulations."
+  blog_slugs: []
+  map_pin_ids: [albuquerque]
+
+- id: sandia-cint-2023
+  org: Sandia National Laboratories — Center for Integrated Nanotechnologies
+  role: Summer Research Intern (advisors Dr. Rémi Dingreville and Dr. Chongze Hu)
+  location: Albuquerque, NM
+  start: "2023-05"
+  end: "2023-06"
+  highlights:
+    - "Created a C++ software package for linear reduced-order modeling of nanoscale characterization simulations for metals."
+    - "Applied and validated the algorithms on graphene and aluminum lattice simulations using LAMMPS."
+    - "Leveraged the fix to run simulations of over 100,000 atoms to model energy surfaces in nano-films."
+  blog_slugs: []
+  map_pin_ids: [albuquerque]
+
+- id: duke-housecs59-fall25
+  org: Duke University
+  role: Student Co-Instructor — HOUSECS 59 (Introduction to Energy and Climate Investing)
+  location: Durham, NC
+  start: "2025-08"
+  end: "2025-12"
+  highlights:
+    - "Co-designed and co-taught a student-led house course introducing energy and climate investing."
+  blog_slugs: []
+  map_pin_ids: [durham]
+
+- id: duke-me336-ta
+  org: Duke University — Dept. of Mechanical Engineering and Materials Science
+  role: Undergraduate Teaching Assistant — ME 336 (Introduction to Fluid Mechanics)
+  location: Durham, NC
+  start: "2025-08"
+  end: "2025-12"
+  highlights:
+    - "Undergraduate teaching assistant for ME 336 (Introduction to Fluid Mechanics) at Duke University."
+  blog_slugs: []
+  map_pin_ids: [durham]
+
+- id: duke-housecs59-spr24
+  org: Duke University — Program in Education
+  role: Student Instructor — HOUSECS 59 (The Durham Giving Project)
+  location: Durham, NC
+  start: "2024-01"
+  end: "2024-05"
+  highlights:
+    - "Designed and led a student-taught house course on philanthropy in Durham with advisor Rev. Sam Miglarese."
+  blog_slugs: []
+  map_pin_ids: [durham]
+
+- id: duke-cs201-ta
+  org: Duke University — Dept. of Computer Science
+  role: Undergraduate Teaching Assistant — COMPSCI 201 (Introduction to Data Structures and Algorithms)
+  location: Durham, NC
+  start: "2023-08"
+  end: "2024-05"
+  highlights:
+    - "Undergraduate teaching assistant across two semesters of Duke's core data structures course."
+  blog_slugs: []
+  map_pin_ids: [durham]
+
+- id: duke-randolph-ra
+  org: Duke University
+  role: Resident Assistant — Randolph Dormitory
+  location: Durham, NC
+  start: "2024-08"
+  end: "2025-05"
+  highlights:
+    - "Resident Assistant at Randolph Dormitory, Duke University."
+  blog_slugs: []
+  map_pin_ids: [durham]
+
+- id: duke-chronicle
+  org: The Chronicle — Duke University
+  role: Senior Reporter
+  location: Durham, NC
+  start: "2022-08"
+  end: "2023-05"
+  org_url: https://www.dukechronicle.com
+  highlights:
+    - "Senior reporter for The Chronicle, Duke University's independent student newspaper."
+  blog_slugs: []
+  map_pin_ids: [durham]
