@@ -23,7 +23,6 @@ jobs:
         uses: actions/checkout@v4
         with:
           ref: ${{ github.head_ref || github.ref }}
-          fetch-depth: 0
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -39,8 +38,7 @@ jobs:
         if: >-
           github.event_name == 'pull_request' &&
           github.event.pull_request.head.repo.full_name == github.repository &&
-          github.actor != 'github-actions[bot]' &&
-          !startsWith(github.event.head_commit.message, 'chore: apply eslint --fix')
+          github.actor != 'github-actions[bot]'
         run: npx eslint . --fix
 
       - name: Commit auto-fix
@@ -50,7 +48,7 @@ jobs:
           github.event.pull_request.head.repo.full_name == github.repository
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          commit_message: 'chore: apply eslint --fix'
+          commit_message: 'chore: apply eslint --fix [skip ci]'
 
       - name: Lint
         run: npm run lint

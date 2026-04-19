@@ -85,7 +85,7 @@ permissions:
 | 2 | `actions/setup-node@v4` (Node 24, npm cache) | always |
 | 3 | `npm ci` | always |
 | 4 | `npx eslint . --fix` | PR events only, not from forks, not when actor is the auto-fix bot |
-| 5 | Commit via `stefanzweifel/git-auto-commit-action@v5` with message `chore: apply eslint --fix` | PR events only, only if step 4 produced changes |
+| 5 | Commit via `stefanzweifel/git-auto-commit-action@v5` with message `chore: apply eslint --fix [skip ci]` | PR events only, only if step 4 produced changes |
 | 6 | `npm run lint` | always |
 | 7 | `npm run typecheck` (new script — see below) | always |
 | 8 | `npm run test` | always |
@@ -98,17 +98,16 @@ Steps 6–9 run against whatever code is in the working tree *after* the auto-fi
 Auto-fix and commit steps use a single reusable `if`:
 
 ```yaml
-if: >
+if: >-
   github.event_name == 'pull_request' &&
   github.event.pull_request.head.repo.full_name == github.repository &&
-  github.actor != 'github-actions[bot]' &&
-  !startsWith(github.event.head_commit.message, 'chore: apply eslint --fix')
+  github.actor != 'github-actions[bot]'
 ```
 
 - `event_name == 'pull_request'` — skip on pushes to `main`.
 - `head.repo.full_name == github.repository` — skip on forks; we can't push to a forked PR branch, and the validation steps still run.
 - `actor != 'github-actions[bot]'` — belt-and-braces loop prevention.
-- Commit-message prefix check — additional loop prevention in case an auto-fix commit somehow becomes the head.
+- The `[skip ci]` trailer in the commit message (step 5) is the primary loop-prevention mechanism — GitHub natively skips workflow runs triggered by commits containing `[skip ci]`.
 
 ### package.json change
 
@@ -122,7 +121,7 @@ This keeps the same command available locally and in CI, and avoids inlining `ts
 
 ## Risks & caveats
 
-- **Default `GITHUB_TOKEN` commits don't retrigger workflows.** Accepted: auto-fix runs in the same job as validation, so CI always sees the final fixed state within a single run. If, at some future point, we want subsequent workflows (e.g. deploy) to fire off the auto-fix commit, we'd switch to a GitHub App token or PAT — explicitly out of scope here.
+- **Loop prevention is two-layered.** The auto-fix commit message includes `[skip ci]`, which GitHub natively recognises and skips — this is the primary guard. The `GITHUB_TOKEN` also does not retrigger workflows by default, serving as a secondary safeguard. Together they make a retriggering loop effectively impossible without any commit-message inspection in the `if:` expression.
 - **Auto-fix creates a commit in the PR history.** Acceptable — it's a single well-labeled `chore:` commit and authors can squash on merge.
 - **Forks get no auto-fix.** Acceptable — we don't expect external contributors on a personal site, and validation still runs.
 - **Vercel Agent is public beta.** Behaviour may change or it may post noisy comments. If it does, it can be disabled from the dashboard without any repo change.

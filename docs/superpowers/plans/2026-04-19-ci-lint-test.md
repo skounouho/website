@@ -106,7 +106,6 @@ jobs:
         uses: actions/checkout@v4
         with:
           ref: ${{ github.head_ref || github.ref }}
-          fetch-depth: 0
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -122,8 +121,7 @@ jobs:
         if: >-
           github.event_name == 'pull_request' &&
           github.event.pull_request.head.repo.full_name == github.repository &&
-          github.actor != 'github-actions[bot]' &&
-          !startsWith(github.event.head_commit.message, 'chore: apply eslint --fix')
+          github.actor != 'github-actions[bot]'
         run: npx eslint . --fix
 
       - name: Commit auto-fix
@@ -133,7 +131,7 @@ jobs:
           github.event.pull_request.head.repo.full_name == github.repository
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          commit_message: 'chore: apply eslint --fix'
+          commit_message: 'chore: apply eslint --fix [skip ci]'
 
       - name: Lint
         run: npm run lint
@@ -250,7 +248,7 @@ Expected: the most recent run on `main` is `completed / success`. This validates
 
 Open a throwaway branch with a trivial fixable lint violation (e.g. an unused import in a file under `app/`). Open a PR. Confirm:
 
-1. The `Commit auto-fix` step produces a commit on the PR branch with message `chore: apply eslint --fix`.
+1. The `Commit auto-fix` step produces a commit on the PR branch with message `chore: apply eslint --fix [skip ci]`.
 2. The subsequent `Lint` / `Typecheck` / `Test` / `Build` steps all pass.
 
 Close the throwaway PR without merging.
