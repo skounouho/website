@@ -1,0 +1,12 @@
+- id: akara-markets
+  org: Akara Markets
+  role: Head of Product
+  location: New York City, NY
+  start: "2026-01"
+  end: null
+  org_url: https://akaramarkets.com
+  highlights:
+    - "Founding team of a start-up building courtside intelligence for sports prediction markets."
+    - "Built and iterated on web and iOS apps in React / React Native."
+  blog_slugs: []
+  map_pin_ids: [nyc]
