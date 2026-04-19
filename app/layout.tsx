@@ -4,6 +4,7 @@ import "@fontsource-variable/alegreya/wght-italic.css";
 import "@fontsource/lato/400.css";
 import "@fontsource/lato/700.css";
 import "@fontsource/jetbrains-mono/400.css";
+import "katex/dist/katex.min.css";
 import "./globals.css";
 import { FloatingNav } from "@/components/nav/FloatingNav";
 import { ThemeScript } from "@/components/nav/theme-script";
