@@ -78,9 +78,7 @@ export type EducationEntry = z.infer<typeof educationEntrySchema>;
 export const publicationKind = z.enum([
   "journal",
   "preprint",
-  "conference",
-  "talk",
-  "poster",
+  "presentation",
 ]);
 export const publicationStatus = z.enum([
   "published",
