@@ -36,6 +36,12 @@ describe("loadBlogPosts", () => {
     ).toThrow(/duplicate.*slug|slug.*dup/i);
   });
 
+  it("throws on duplicate slug across draft + non-draft", () => {
+    expect(() =>
+      loadBlogPosts(fx("blog-dup-slug-draft"), { includeDrafts: false }),
+    ).toThrow(/duplicate.*slug|slug.*dup/i);
+  });
+
   it("returns [] if directory does not exist", () => {
     expect(
       loadBlogPosts(fx("blog-does-not-exist"), { includeDrafts: true }),

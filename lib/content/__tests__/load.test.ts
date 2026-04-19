@@ -25,4 +25,13 @@ describe("loadAll", () => {
       loadAll({ contentRoot: fx("tree-bad-blog-ref"), includeDrafts: true }),
     ).toThrow(/unknown.*blog.*missing/i);
   });
+
+  it("validates draft cross-refs even when drafts are excluded from output", () => {
+    expect(() =>
+      loadAll({
+        contentRoot: fx("tree-bad-draft-place"),
+        includeDrafts: false,
+      }),
+    ).toThrow(/unknown.*pin.*mars/i);
+  });
 });

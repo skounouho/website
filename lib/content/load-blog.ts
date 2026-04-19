@@ -36,7 +36,14 @@ export function loadBlogPosts(
     const [, filenameDate, slug] = match;
 
     const { data, body } = parseMdx(abs);
-    const fm = blogFrontmatterSchema.parse(data);
+    const parsed = blogFrontmatterSchema.safeParse(data);
+    if (!parsed.success) {
+      throw new ContentParseError(
+        abs,
+        `frontmatter failed validation: ${parsed.error.message}`,
+      );
+    }
+    const fm = parsed.data;
 
     if (fm.date !== filenameDate) {
       throw new ContentParseError(

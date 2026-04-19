@@ -35,13 +35,15 @@ export function loadAll({
   const p = contentPaths(contentRoot);
 
   const pins = loadPins(p.map);
-  const posts = loadBlogPosts(p.blog, { includeDrafts });
+  const allPosts = loadBlogPosts(p.blog, { includeDrafts: true });
   const work = loadWork(p.resume.work);
   const education = loadEducation(p.resume.education);
   const publications = loadPublications(p.resume.publications);
 
   const pinIds = new Set(pins.map((x) => x.id));
-  const slugs = new Set(posts.map((x) => x.slug));
+  const publicSlugs = new Set(
+    allPosts.filter((x) => !x.draft).map((x) => x.slug),
+  );
 
   const checkPinRefs = (where: string, ownerId: string, ids: string[]) => {
     for (const id of ids) {
@@ -56,16 +58,16 @@ export function loadAll({
 
   const checkBlogRefs = (where: string, ownerId: string, s: string[]) => {
     for (const slug of s) {
-      if (!slugs.has(slug)) {
+      if (!publicSlugs.has(slug)) {
         throw new ContentParseError(
           where,
-          `${ownerId}: unknown blog slug "${slug}" — not found in content/blog/`,
+          `${ownerId}: unknown blog slug "${slug}" — not found in content/blog/ (drafts are not referenceable)`,
         );
       }
     }
   };
 
-  for (const post of posts) {
+  for (const post of allPosts) {
     checkPinRefs(post.filePath, post.slug, post.places);
   }
   for (const w of work) {
@@ -82,5 +84,6 @@ export function loadAll({
     checkBlogRefs(p.map, pin.id, pin.blog_slugs);
   }
 
+  const posts = includeDrafts ? allPosts : allPosts.filter((x) => !x.draft);
   return { posts, work, education, publications, pins };
 }
