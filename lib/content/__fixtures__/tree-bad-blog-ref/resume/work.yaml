@@ -1,0 +1,9 @@
+- id: akara
+  org: Akara
+  role: Head of Product
+  location: NYC
+  start: "2026-01"
+  end: null
+  highlights: [h]
+  blog_slugs: [missing]
+  map_pin_ids: [nyc]
