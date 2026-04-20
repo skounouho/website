@@ -21,10 +21,13 @@ export function WorkEntry({
   return (
     <article>
       <details className="group/work">
-        <summary className="list-none cursor-pointer space-y-2 [&::-webkit-details-marker]:hidden">
+        <summary className="list-none cursor-pointer space-y-1 [&::-webkit-details-marker]:hidden">
           <h3 className="font-sans text-[20px] font-bold leading-tight transition-colors duration-[var(--duration-fast)] ease-[var(--ease-standard)] group-hover/work:text-[color:var(--accent)]">
             {entry.role}
           </h3>
+          {entry.subtitle ? (
+            <div className="font-serif italic">{entry.subtitle}</div>
+          ) : null}
           <div className="font-serif text-sm" style={{ color: "var(--fg-muted)" }}>
             {entry.org_url ? (
               <a href={entry.org_url} target="_blank" rel="noopener noreferrer">

@@ -53,6 +53,7 @@ export const workEntrySchema = yearMonthRange({
   id: kebabCase,
   org: z.string().min(1),
   role: z.string().min(1),
+  subtitle: z.string().min(1).optional(),
   location: z.string().min(1),
   start: yearMonth,
   end: yearMonthOrNull,
