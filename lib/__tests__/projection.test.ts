@@ -75,4 +75,12 @@ describe("isUsPin", () => {
     expect(isUsPin({ lat: 48.8566, lon: 2.3522 })).toBe(false); // Paris
     expect(isUsPin({ lat: -33.8688, lon: 151.2093 })).toBe(false); // Sydney
   });
+
+  it("returns false for US territories (documented limitation at 110m resolution)", () => {
+    // Territories aren't included in world-atlas 110m's US feature. A pin
+    // placed in any of these would currently render only on the world map.
+    expect(isUsPin({ lat: 18.4655, lon: -66.1057 })).toBe(false); // San Juan, PR
+    expect(isUsPin({ lat: 13.4443, lon: 144.7937 })).toBe(false); // Hagåtña, Guam
+    expect(isUsPin({ lat: 18.3358, lon: -64.8963 })).toBe(false); // St. Thomas, USVI
+  });
 });

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import { MapCanvas, type ProjectedPin } from "./MapCanvas";
 import { MapInsetButton } from "./MapInsetButton";
 
@@ -29,10 +29,14 @@ export function MapSwitcher({ usMap, worldMap }: Props) {
   const usLayerRef = useRef<HTMLDivElement>(null);
   const worldLayerRef = useRef<HTMLDivElement>(null);
   const insetRef = useRef<HTMLButtonElement>(null);
-  const didMountRef = useRef(false);
+  // Only animate when the user clicks the inset. Skips hash-routing and
+  // any other programmatic state changes that happen before interaction.
+  const userInitiatedRef = useRef(false);
 
-  // Route deep links to whichever map owns the pin.
-  useEffect(() => {
+  // Route deep links to whichever map owns the pin. Runs as a layout
+  // effect so the correct `active` is committed before the next paint —
+  // no visible swap for URLs like /map#vancouver.
+  useLayoutEffect(() => {
     if (typeof window === "undefined") return;
     const route = () => {
       const hash = window.location.hash.slice(1);
@@ -51,10 +55,7 @@ export function MapSwitcher({ usMap, worldMap }: Props) {
   // animates to fill the container. Runs synchronously before paint so the
   // full-size version never flashes.
   useLayoutEffect(() => {
-    if (!didMountRef.current) {
-      didMountRef.current = true;
-      return;
-    }
+    if (!userInitiatedRef.current) return;
     const inset = insetRef.current;
     const container = containerRef.current;
     const incoming =
@@ -67,6 +68,10 @@ export function MapSwitcher({ usMap, worldMap }: Props) {
       typeof window !== "undefined" &&
       window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (prefersReduced) return;
+
+    // Cancel any in-flight zoom so rapid toggles don't stack animations.
+    incoming.getAnimations().forEach((a) => a.cancel());
+    outgoing?.getAnimations().forEach((a) => a.cancel());
 
     const insetRect = inset.getBoundingClientRect();
     const containerRect = container.getBoundingClientRect();
@@ -93,13 +98,18 @@ export function MapSwitcher({ usMap, worldMap }: Props) {
 
     outgoing?.animate(
       [{ opacity: 1 }, { opacity: 0 }],
-      { duration: ZOOM_DURATION_MS, easing: ZOOM_EASING },
+      { duration: ZOOM_DURATION_MS, easing: ZOOM_EASING, fill: "backwards" },
     );
   }, [active]);
 
   const insetMap = active === "us" ? worldMap : usMap;
   const insetLabel =
     active === "us" ? "Switch to world map" : "Switch to United States map";
+
+  const toggle = () => {
+    userInitiatedRef.current = true;
+    setActive(active === "us" ? "world" : "us");
+  };
 
   return (
     <div
@@ -117,13 +127,13 @@ export function MapSwitcher({ usMap, worldMap }: Props) {
         viewBox={insetMap.viewBox}
         regionPaths={insetMap.regionPaths}
         ariaLabel={insetLabel}
-        onClick={() => setActive(active === "us" ? "world" : "us")}
+        onClick={toggle}
       />
     </div>
   );
 }
 
-const Layer = function Layer({
+function Layer({
   visible,
   children,
   ref,
@@ -135,13 +145,15 @@ const Layer = function Layer({
   return (
     <div
       ref={ref}
-      aria-hidden={!visible}
+      // `inert` removes the subtree from the a11y tree, tab order, and
+      // pointer input — necessary because the hidden map still contains
+      // focusable popover content (close buttons, external links).
+      inert={!visible}
       className={
-        "absolute inset-0 " +
-        (visible ? "opacity-100" : "pointer-events-none opacity-0")
+        "absolute inset-0 " + (visible ? "opacity-100" : "opacity-0")
       }
     >
       {children}
     </div>
   );
-};
+}

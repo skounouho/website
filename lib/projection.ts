@@ -53,6 +53,12 @@ export function projectUsPoint(
   return xy ? [xy[0], xy[1]] : null;
 }
 
+// Excludes US territories (Puerto Rico, Guam, USVI, Samoa, N. Mariana).
+// Neither world-atlas 110m nor the default geoAlbersUsa inset covers them,
+// so a territory pin would currently render only on the world map. If that
+// ever matters, switch to higher-resolution world-atlas and extend
+// geoAlbersUsa with explicit insets, or add an explicit region field to
+// MapPin.
 export function isUsPin(p: { lat: number; lon: number }): boolean {
   if (!usFeature) return false;
   return geoContains(usFeature, [p.lon, p.lat]);

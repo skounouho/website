@@ -19,7 +19,7 @@ export const MapInsetButton = forwardRef<HTMLButtonElement, Props>(function MapI
       type="button"
       onClick={onClick}
       aria-label={ariaLabel}
-      className="fixed bottom-8 right-8 z-20 h-[84px] w-36 overflow-hidden rounded-sm border border-[var(--border)] bg-[var(--bg)] shadow-sm transition-[border-color,transform] motion-safe:duration-[var(--duration-fast)] hover:border-[var(--accent)] hover:scale-[1.03] focus-visible:border-[var(--accent)] focus-visible:outline-none"
+      className="fixed bottom-8 right-8 z-20 h-[84px] w-36 overflow-hidden rounded-sm border border-[var(--border)] bg-[var(--bg)] shadow-sm transition-colors motion-safe:duration-[var(--duration-fast)] hover:border-[var(--accent)] focus-visible:border-[var(--accent)] focus-visible:outline-none"
     >
       <svg
         viewBox={viewBox}
