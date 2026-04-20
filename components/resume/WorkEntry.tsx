@@ -20,7 +20,7 @@ export function WorkEntry({
 
   return (
     <article className="space-y-3">
-      <h3 className="font-sans text-[22px] font-medium leading-tight">
+      <h3 className="font-sans text-[20px] font-bold leading-tight">
         {entry.role}
       </h3>
       <div className="font-serif text-sm" style={{ color: "var(--fg-muted)" }}>

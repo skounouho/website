@@ -13,7 +13,7 @@ export function PostHeader({ post }: { post: BlogPost }) {
         </div>
       ) : null}
       <h1
-        className="font-sans mt-3 text-[40px] font-bold leading-[1.15]"
+        className="font-sans mt-3 text-[36px] font-bold leading-[1.15]"
         style={{ color: "var(--fg)" }}
       >
         {post.title}

@@ -38,7 +38,7 @@ export function PinPopover({ pin, x, y, onClose }: Props) {
       }}
     >
       <div className="flex items-center gap-3">
-        <h3 id={headingId} className="font-sans text-[20px] font-medium">
+        <h3 id={headingId} className="font-sans text-[20px] font-bold">
           {pin.name}
         </h3>
         <span
@@ -76,7 +76,7 @@ export function PinPopover({ pin, x, y, onClose }: Props) {
       ) : null}
       {pin.blog_slugs.length > 0 ? (
         <div className="mt-4">
-          <h4 className="font-sans text-[16px] font-medium">
+          <h4 className="font-sans text-[16px] font-bold">
             Related writing
           </h4>
           <ul className="font-serif mt-1 flex flex-col gap-1 text-sm">

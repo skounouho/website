@@ -29,7 +29,7 @@ export function PostFooter({
 
       {places.length > 0 ? (
         <div className="mb-8">
-          <h3 className="font-sans mb-2 text-[18px] font-medium">
+          <h3 className="font-sans mb-2 text-[20px] font-bold">
             Places mentioned
           </h3>
           <ul className="font-serif flex flex-col gap-1">

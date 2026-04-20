@@ -11,7 +11,7 @@ export function EducationEntry({ entry }: { entry: Edu }) {
 
   return (
     <article className="grid grid-cols-[1fr_auto] items-baseline gap-x-6 gap-y-2">
-      <h3 className="font-sans text-[22px] font-medium leading-tight">
+      <h3 className="font-sans text-[20px] font-bold leading-tight">
         {entry.degree}
       </h3>
       <div
