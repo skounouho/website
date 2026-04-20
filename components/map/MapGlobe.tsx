@@ -187,6 +187,13 @@ export function MapGlobe({
   const flyRafRef = useRef<number | null>(null);
   const driftRafRef = useRef<number | null>(null);
   const globeCircleRef = useRef<SVGCircleElement | null>(null);
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  // React's JSX onWheel is attached as a passive listener, so preventDefault()
+  // is silently ignored. We bind imperatively below with { passive: false };
+  // scaleRef lets the mount-once handler read the latest committed scale
+  // without rebinding on every zoom.
+  const scaleRef = useRef(scale);
+  scaleRef.current = scale;
   // Tracks whether the most recent pointerdown landed on the globe, so that
   // the synthesized click at pointerup doesn't trigger "resume auto" when
   // the user was dragging the globe (especially drag-release off-sphere).
@@ -299,8 +306,27 @@ export function MapGlobe({
     };
   }, []);
 
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const onWheel = (e: WheelEvent) => {
+      if (!isPointerOnGlobe(e.clientX, e.clientY)) return;
+      e.preventDefault();
+      cancelFly();
+      cancelDrift();
+      setMode("user");
+      const factor = Math.exp(-e.deltaY * 0.001);
+      scheduleScale(scaleRef.current * factor);
+    };
+    el.addEventListener("wheel", onWheel, { passive: false });
+    return () => el.removeEventListener("wheel", onWheel);
+    // Handler only reads refs + stable setters, so subscribe once.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
     <div
+      ref={containerRef}
       tabIndex={0}
       className="relative h-[calc(100vh-56px)] md:h-screen w-full overflow-hidden touch-none outline-none focus-visible:ring-1 focus-visible:ring-[var(--fg-muted)] focus-visible:ring-inset"
       onKeyDown={(e) => {
@@ -446,19 +472,6 @@ export function MapGlobe({
         if (pinchRef.current.pointers.size < 2) {
           pinchRef.current.startDistance = null;
         }
-      }}
-      // React 17+ attaches onWheel as a passive listener, so preventDefault() is
-      // silently ignored. Benign here because /map is a full-viewport page with
-      // no scrollable ancestor. If a future layout introduces one, switch to a
-      // non-passive listener via ref.addEventListener("wheel", ..., { passive: false }).
-      onWheel={(e) => {
-        if (!isPointerOnGlobe(e.clientX, e.clientY)) return;
-        e.preventDefault();
-        cancelFly();
-        cancelDrift();
-        setMode("user");
-        const factor = Math.exp(-e.deltaY * 0.001);
-        scheduleScale(scale * factor);
       }}
       onClick={(e) => {
         if ((e.target as HTMLElement).closest("[data-pin]")) return;
