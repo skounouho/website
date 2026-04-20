@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { feature } from "topojson-client";
-import type { Topology, GeometryCollection } from "topojson-specification";
 import type { ExtendedFeatureCollection } from "d3-geo";
 import worldTopo from "world-atlas/countries-110m.json";
 import statesTopo from "us-atlas/states-10m.json";
@@ -11,7 +10,11 @@ import {
   GLOBE_WIDTH,
   GLOBE_HEIGHT,
 } from "@/lib/projection";
-import { MapGlobe } from "@/components/map/MapGlobe";
+import {
+  MapGlobe,
+  type StatesTopology,
+  type WorldTopology,
+} from "@/components/map/MapGlobe";
 
 export const metadata: Metadata = {
   title: "Map",
@@ -26,17 +29,8 @@ const INITIAL_SCALE = 1;
 export default function MapPage() {
   const pins = getPins();
 
-  const worldFeatures = feature(
-    worldTopo as unknown as Topology<{ countries: GeometryCollection }>,
-    (worldTopo as unknown as Topology<{ countries: GeometryCollection }>)
-      .objects.countries,
-  ) as unknown as ExtendedFeatureCollection;
-
-  const stateFeatures = feature(
-    statesTopo as unknown as Topology<{ states: GeometryCollection }>,
-    (statesTopo as unknown as Topology<{ states: GeometryCollection }>).objects
-      .states,
-  ) as unknown as ExtendedFeatureCollection;
+  const world = worldTopo as unknown as WorldTopology;
+  const states = statesTopo as unknown as StatesTopology;
 
   const initialProjection = createGlobeProjection({
     width: GLOBE_WIDTH,
@@ -45,15 +39,18 @@ export default function MapPage() {
     rotation: INITIAL_ROTATION,
   });
   const initialCountryPaths = pathsFromGeojson(
-    worldFeatures,
+    feature(
+      world,
+      world.objects.countries,
+    ) as unknown as ExtendedFeatureCollection,
     initialProjection,
   );
 
   return (
     <MapGlobe
       pins={pins}
-      worldFeatures={worldFeatures}
-      stateFeatures={stateFeatures}
+      worldTopo={world}
+      statesTopo={states}
       initialRotation={INITIAL_ROTATION}
       initialScale={INITIAL_SCALE}
       initialCountryPaths={initialCountryPaths}
