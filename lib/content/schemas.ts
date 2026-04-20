@@ -65,6 +65,13 @@ export const workEntrySchema = yearMonthRange({
   category: workCategory,
   blog_slugs: z.array(kebabCase).default([]),
   map_pin_ids: z.array(kebabCase).default([]),
+  articles: z
+    .array(
+      z
+        .object({ title: z.string().min(1), url, date: isoDate.optional() })
+        .strict(),
+    )
+    .default([]),
 });
 
 export type WorkEntry = z.infer<typeof workEntrySchema>;

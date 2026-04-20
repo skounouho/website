@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import {
   getAboutPage,
   getBlogPosts,
@@ -43,7 +44,42 @@ export default function Home() {
   return (
     <PageContainer>
       <section id="about">
+        <Image
+          src="/headshot_white.png"
+          alt="Illustrated portrait of Senou Kounouho"
+          width={800}
+          height={801}
+          priority
+          quality={95}
+          sizes="96px"
+          className="mb-[var(--space-block)] h-24 w-24 rounded-full object-cover"
+        />
         <article className="prose-site w-full">{renderMdx(about.body)}</article>
+        <ul
+          className="mt-[var(--space-block)] flex flex-wrap gap-x-5 gap-y-2 font-sans text-sm"
+          style={{ color: "var(--fg-muted)" }}
+        >
+          <li>
+            <a
+              href="https://www.linkedin.com/in/kounouho/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="no-underline transition-colors duration-[var(--duration-fast)] ease-[var(--ease-standard)] hover:text-[color:var(--accent)]"
+            >
+              LinkedIn
+            </a>
+          </li>
+          <li>
+            <a
+              href="https://x.com/SenouKounouho"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="no-underline transition-colors duration-[var(--duration-fast)] ease-[var(--ease-standard)] hover:text-[color:var(--accent)]"
+            >
+              X
+            </a>
+          </li>
+        </ul>
       </section>
 
       <hr

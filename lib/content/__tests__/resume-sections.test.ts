@@ -18,6 +18,7 @@ const work = (over: Partial<WorkEntry>): WorkEntry => ({
   category: "paid",
   blog_slugs: [],
   map_pin_ids: [],
+  articles: [],
   ...over,
 });
 

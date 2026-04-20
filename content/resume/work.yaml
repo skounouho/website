@@ -153,3 +153,19 @@
   category: teaching-other
   blog_slugs: []
   map_pin_ids: [durham]
+  articles:
+    - title: "'Partners in the work': DSG President Isaiah Hamilton to focus on inclusivity, collaboration with student groups in presidency"
+      url: https://www.dukechronicle.com/article/2023/05/duke-university-duke-student-government-dsg-isaiah-hamilton-president
+      date: "2023-05-24"
+    - title: "'Their Duke experience is just beginning': NBA Commissioner, commencement speaker Adam Silver recalls time at Duke"
+      url: https://www.dukechronicle.com/article/2023/05/duke-university-adam-silver-commencement-class-of-2023-national-basketball-association
+      date: "2023-05-09"
+    - title: "Student Organization Finance Committee presents proposed overhaul of student group funding process to DSG Senate"
+      url: https://www.dukechronicle.com/article/2023/03/duke-student-organization-finance-committee-presents-proposed-overhaul-of-student-group-funding-process-at-dsg-senate-office-of-student-affairs
+      date: "2023-03-30"
+    - title: "'Too many people take voting for granted': Duke Democracy Day highlights youth voting as midterms near"
+      url: https://www.dukechronicle.com/article/2022/10/duke-university-democracy-day-voting-north-carolina-durham-midterm-elections-youth-voters
+      date: "2022-10-31"
+    - title: "Inaugural cohort of Duke Forest Stewards promotes sustainable recreation, provides critical help to staff"
+      url: https://www.dukechronicle.com/article/2022/10/duke-university-forest-inaugural-cohort-of-duke-forest-stewards-promote-sustainable-recreation-provide-critical-capacity-to-staff
+      date: "2022-10-04"
