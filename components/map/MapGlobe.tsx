@@ -220,9 +220,10 @@ export function MapGlobe({
   return (
     <div
       tabIndex={0}
-      className="relative h-[calc(100vh-56px)] md:h-screen w-full overflow-hidden touch-none outline-none"
+      className="relative h-[calc(100vh-56px)] md:h-screen w-full overflow-hidden touch-none outline-none focus-visible:ring-1 focus-visible:ring-[var(--fg-muted)] focus-visible:ring-inset"
       style={{ cursor: dragRef.current ? "grabbing" : "grab" }}
       onKeyDown={(e) => {
+        if (e.metaKey || e.ctrlKey) return;
         const STEP = 5;           // degrees per arrow key
         const ZOOM_FACTOR = 1.2;  // multiplicative per +/-
         if (e.key === "ArrowLeft") {
@@ -323,6 +324,10 @@ export function MapGlobe({
           pinchRef.current.startDistance = null;
         }
       }}
+      // React 17+ attaches onWheel as a passive listener, so preventDefault() is
+      // silently ignored. Benign here because /map is a full-viewport page with
+      // no scrollable ancestor. If a future layout introduces one, switch to a
+      // non-passive listener via ref.addEventListener("wheel", ..., { passive: false }).
       onWheel={(e) => {
         e.preventDefault();
         cancelFly();
@@ -381,7 +386,8 @@ export function MapGlobe({
               tabIndex={0}
               role="button"
               aria-label={pin.name}
-              style={{ cursor: "pointer", outline: "none" }}
+              className="group outline-none"
+              style={{ cursor: "pointer" }}
               onKeyDown={(e) => {
                 if (e.key === "Enter" || e.key === " ") {
                   e.preventDefault();
@@ -394,6 +400,17 @@ export function MapGlobe({
                 }
               }}
             >
+              <circle
+                cx={x}
+                cy={y}
+                r={10}
+                fill="none"
+                stroke="var(--fg-muted)"
+                strokeWidth={1.5}
+                vectorEffect="non-scaling-stroke"
+                className="opacity-0 group-focus-visible:opacity-100 transition-opacity duration-[var(--duration-fast)]"
+                aria-hidden="true"
+              />
               <circle
                 data-pin={pin.id}
                 cx={x}
