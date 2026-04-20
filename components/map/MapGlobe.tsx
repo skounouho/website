@@ -24,6 +24,7 @@ import { useAutoRotate, type GlobeMode } from "./hooks/useAutoRotate";
 import { useFlyTo } from "./hooks/useFlyTo";
 import { useDrift } from "./hooks/useDrift";
 import { useGlobeWheel } from "./hooks/useGlobeWheel";
+import { useGlobeHashRoute } from "./hooks/useGlobeHashRoute";
 
 export type WorldTopology = Topology<{ countries: GeometryCollection }>;
 export type StatesTopology = Topology<{ states: GeometryCollection }>;
@@ -147,35 +148,16 @@ export function MapGlobe({
     return () => window.removeEventListener("keydown", onKey);
   }, []);
 
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-
-    const route = () => {
-      const hash = window.location.hash.slice(1);
-      if (!hash) return;
-      const pin = pins.find((p) => p.id === hash);
-      if (!pin) return;
-      if (prefersReducedMotion) {
-        cancelDrift();
-        const target = flyToTarget(pin);
-        setRotation(target.rotation);
-        setScale(target.scale);
-        setMode("user");
-        setOpenPinId(pin.id);
-      } else {
-        setOpenPinId(null);
-        startFlyTo(pin, () => setOpenPinId(pin.id));
-      }
-    };
-
-    route();
-    window.addEventListener("hashchange", route);
-    return () => window.removeEventListener("hashchange", route);
-    // `startFlyTo` reads current rotation/scale via the closure each call,
-    // which is what we want — it should tween from wherever the globe is
-    // when the hash fires.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pins, prefersReducedMotion]);
+  useGlobeHashRoute({
+    pins,
+    prefersReducedMotion,
+    setRotation,
+    setScale,
+    setMode,
+    setOpenPinId,
+    cancelDrift,
+    startFlyTo,
+  });
 
   const openPin = projectedPins.find((p) => p.pin.id === openPinId) ?? null;
 
