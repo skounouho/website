@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { ExtendedFeatureCollection } from "d3-geo";
 import type { MapPin } from "@/lib/content";
 import {
@@ -12,6 +12,7 @@ import {
   GLOBE_HEIGHT,
   GLOBE_BASE_RADIUS,
 } from "@/lib/projection";
+import { PinPopover } from "./PinPopover";
 
 export interface MapGlobeProps {
   pins: MapPin[];
@@ -30,8 +31,9 @@ export function MapGlobe({
   initialScale,
   initialCountryPaths,
 }: MapGlobeProps) {
-  const rotation = initialRotation;
-  const scale = initialScale;
+  const [rotation] = useState<[number, number]>(initialRotation);
+  const [scale] = useState<number>(initialScale);
+  const [openPinId, setOpenPinId] = useState<string | null>(null);
 
   const { countryPaths, statePaths, projectedPins } = useMemo(() => {
     const projection = createGlobeProjection({
@@ -40,7 +42,6 @@ export function MapGlobe({
       scale,
       rotation,
     });
-    // On first render, reuse the SSR paths instead of re-computing.
     const isInitial =
       rotation[0] === initialRotation[0] &&
       rotation[1] === initialRotation[1] &&
@@ -55,8 +56,8 @@ export function MapGlobe({
       .map((pin) => {
         const xy = projection([pin.lon, pin.lat]);
         if (!xy) return null;
-        const visible = isPinVisible(pin, rotation);
-        return visible ? { pin, x: xy[0], y: xy[1] } : null;
+        if (!isPinVisible(pin, rotation)) return null;
+        return { pin, x: xy[0], y: xy[1] };
       })
       .filter((p): p is { pin: MapPin; x: number; y: number } => p !== null);
     return { countryPaths, statePaths, projectedPins };
@@ -71,8 +72,24 @@ export function MapGlobe({
     initialScale,
   ]);
 
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "Escape") setOpenPinId(null);
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
+
+  const openPin = projectedPins.find((p) => p.pin.id === openPinId) ?? null;
+
   return (
-    <div className="relative h-[calc(100vh-56px)] md:h-screen w-full overflow-hidden">
+    <div
+      className="relative h-[calc(100vh-56px)] md:h-screen w-full overflow-hidden"
+      onClick={(e) => {
+        if ((e.target as HTMLElement).closest("[data-pin]")) return;
+        setOpenPinId(null);
+      }}
+    >
       <svg
         viewBox={`0 0 ${GLOBE_WIDTH} ${GLOBE_HEIGHT}`}
         className="absolute inset-0 h-full w-full"
@@ -100,12 +117,7 @@ export function MapGlobe({
             />
           ))}
         </g>
-        <g
-          style={{
-            opacity: shouldShowStateBorders(scale) ? 0.6 : 0,
-            transition: "opacity 150ms ease",
-          }}
-        >
+        <g style={{ opacity: shouldShowStateBorders(scale) ? 0.6 : 0, transition: "opacity 150ms ease" }}>
           {statePaths.map((d, i) => (
             <path
               key={i}
@@ -128,11 +140,25 @@ export function MapGlobe({
               fill="var(--accent)"
               stroke="var(--bg)"
               strokeWidth={2}
+              style={{ cursor: "pointer" }}
               aria-label={pin.name}
+              onClick={(e) => {
+                e.stopPropagation();
+                setOpenPinId((prev) => (prev === pin.id ? null : pin.id));
+              }}
             />
           ))}
         </g>
       </svg>
+
+      {openPin ? (
+        <PinPopover
+          pin={openPin.pin}
+          x={(openPin.x / GLOBE_WIDTH) * 100}
+          y={(openPin.y / GLOBE_HEIGHT) * 100}
+          onClose={() => setOpenPinId(null)}
+        />
+      ) : null}
     </div>
   );
 }
