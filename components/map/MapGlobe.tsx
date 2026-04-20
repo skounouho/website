@@ -20,6 +20,7 @@ import {
 import { cubicBezierEase, lerpRotation, lerpScale } from "@/lib/tween";
 import { PinPopover } from "./PinPopover";
 import { usePrefersReducedMotion } from "./hooks/usePrefersReducedMotion";
+import { useRafBatch } from "./hooks/useRafBatch";
 
 export type WorldTopology = Topology<{ countries: GeometryCollection }>;
 export type StatesTopology = Topology<{ states: GeometryCollection }>;
@@ -61,6 +62,8 @@ export function MapGlobe({
     prefersReducedMotion ? "user" : "auto",
   );
   const [openPinId, setOpenPinId] = useState<string | null>(null);
+
+  const { scheduleRotation, scheduleScale } = useRafBatch(setRotation, setScale);
 
   // Materialize features from topology once on the client. Shipping the raw
   // TopoJSON (arc-encoded, shared boundaries) rather than the expanded
@@ -177,9 +180,6 @@ export function MapGlobe({
     startRotation: [number, number];
     samples: Array<{ x: number; y: number; t: number }>;
   } | null>(null);
-  const pendingRotationRef = useRef<[number, number] | null>(null);
-  const pendingScaleRef = useRef<number | null>(null);
-  const rafRef = useRef<number | null>(null);
   const pinchRef = useRef<{
     pointers: Map<number, { x: number; y: number }>;
     startDistance: number | null;
@@ -272,36 +272,8 @@ export function MapGlobe({
     flyRafRef.current = requestAnimationFrame(step);
   }
 
-  function flushPendingRotation() {
-    if (pendingRotationRef.current) {
-      setRotation(pendingRotationRef.current);
-      pendingRotationRef.current = null;
-    }
-    if (pendingScaleRef.current !== null) {
-      setScale(pendingScaleRef.current);
-      pendingScaleRef.current = null;
-    }
-    rafRef.current = null;
-  }
-
-  function scheduleRotation(next: [number, number]) {
-    pendingRotationRef.current = next;
-    if (rafRef.current === null) {
-      rafRef.current = requestAnimationFrame(flushPendingRotation);
-    }
-  }
-
-  function scheduleScale(next: number) {
-    const clamped = Math.max(SCALE_MIN, Math.min(SCALE_MAX, next));
-    pendingScaleRef.current = clamped;
-    if (rafRef.current === null) {
-      rafRef.current = requestAnimationFrame(flushPendingRotation);
-    }
-  }
-
   useEffect(() => {
     return () => {
-      if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
       if (flyRafRef.current !== null) cancelAnimationFrame(flyRafRef.current);
       if (driftRafRef.current !== null) cancelAnimationFrame(driftRafRef.current);
     };
