@@ -15,7 +15,7 @@ interface NavItem {
 }
 
 const items: NavItem[] = [
-  { href: "/#about", label: "Home", Icon: Home },
+  { href: "/", label: "Home", Icon: Home },
   { href: "/#resume", label: "Resume", Icon: FileText },
   { href: "/blog", label: "Blog", Icon: BookOpen },
   { href: "/map", label: "Map", Icon: Map },
@@ -31,15 +31,12 @@ const RESUME_HASHES = new Set([
 ]);
 
 function isActive(pathname: string, hash: string, href: string): boolean {
-  // Home-page anchor links
-  if (href === "/#about") {
+  if (href === "/") {
     return pathname === "/" && (hash === "" || hash === "#about");
   }
   if (href === "/#resume") {
     return pathname === "/" && RESUME_HASHES.has(hash);
   }
-  // Non-home routes
-  if (href === "/") return pathname === "/";
   return pathname === href || pathname.startsWith(href + "/");
 }
 
