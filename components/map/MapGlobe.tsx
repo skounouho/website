@@ -8,13 +8,18 @@ import {
   pathsFromGeojson,
   isPinVisible,
   shouldShowStateBorders,
+  flyToTarget,
   GLOBE_WIDTH,
   GLOBE_HEIGHT,
   GLOBE_BASE_RADIUS,
   SCALE_MIN,
   SCALE_MAX,
 } from "@/lib/projection";
+import { cubicBezierEase, lerpRotation, lerpScale } from "@/lib/tween";
 import { PinPopover } from "./PinPopover";
+
+const GLOBE_DURATION_MS = 750;
+const GLOBE_EASE = cubicBezierEase(0.2, 0, 0, 1);
 
 export interface MapGlobeProps {
   pins: MapPin[];
@@ -113,6 +118,41 @@ export function MapGlobe({
     startDistance: number | null;
     startScale: number;
   }>({ pointers: new Map(), startDistance: null, startScale: 1 });
+  const flyRafRef = useRef<number | null>(null);
+
+  function cancelFly() {
+    if (flyRafRef.current !== null) {
+      cancelAnimationFrame(flyRafRef.current);
+      flyRafRef.current = null;
+    }
+  }
+
+  function startFlyTo(pin: MapPin, onComplete?: () => void) {
+    cancelFly();
+    const target = flyToTarget(pin);
+    const startRotation = rotation;
+    const startScale = scale;
+    const startTime = performance.now();
+
+    const step = (now: number) => {
+      const raw = Math.min(1, (now - startTime) / GLOBE_DURATION_MS);
+      const eased = GLOBE_EASE(raw);
+      const r = lerpRotation(startRotation, target.rotation, eased);
+      const s = lerpScale(startScale, target.scale, eased);
+      setRotation(r);
+      setScale(s);
+      if (raw < 1) {
+        flyRafRef.current = requestAnimationFrame(step);
+      } else {
+        flyRafRef.current = null;
+        setMode("user");
+        onComplete?.();
+      }
+    };
+
+    setMode("flying");
+    flyRafRef.current = requestAnimationFrame(step);
+  }
 
   function flushPendingRotation() {
     if (pendingRotationRef.current) {
@@ -144,6 +184,7 @@ export function MapGlobe({
   useEffect(() => {
     return () => {
       if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
+      if (flyRafRef.current !== null) cancelAnimationFrame(flyRafRef.current);
     };
   }, []);
 
@@ -154,6 +195,7 @@ export function MapGlobe({
       onPointerDown={(e) => {
         // Ignore clicks on pins — those open popovers.
         if ((e.target as HTMLElement).closest("[data-pin]")) return;
+        cancelFly();
         (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
         dragRef.current = {
           pointerId: e.pointerId,
@@ -212,6 +254,7 @@ export function MapGlobe({
       }}
       onWheel={(e) => {
         e.preventDefault();
+        cancelFly();
         setMode("user");
         const factor = Math.exp(-e.deltaY * 0.001);
         scheduleScale(scale * factor);
@@ -275,7 +318,21 @@ export function MapGlobe({
               aria-label={pin.name}
               onClick={(e) => {
                 e.stopPropagation();
-                setOpenPinId((prev) => (prev === pin.id ? null : pin.id));
+                if (openPinId === pin.id) {
+                  setOpenPinId(null);
+                  return;
+                }
+                if (prefersReducedMotion) {
+                  const target = flyToTarget(pin);
+                  setRotation(target.rotation);
+                  setScale(target.scale);
+                  setMode("user");
+                  setOpenPinId(pin.id);
+                  return;
+                }
+                // Close any existing popover before flying.
+                setOpenPinId(null);
+                startFlyTo(pin, () => setOpenPinId(pin.id));
               }}
             />
           ))}
