@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { ExtendedFeatureCollection } from "d3-geo";
 import type { MapPin } from "@/lib/content";
 import {
@@ -97,9 +97,71 @@ export function MapGlobe({
 
   const openPin = projectedPins.find((p) => p.pin.id === openPinId) ?? null;
 
+  const dragRef = useRef<{
+    pointerId: number;
+    startX: number;
+    startY: number;
+    startRotation: [number, number];
+  } | null>(null);
+  const pendingRotationRef = useRef<[number, number] | null>(null);
+  const rafRef = useRef<number | null>(null);
+
+  function flushPendingRotation() {
+    if (pendingRotationRef.current) {
+      setRotation(pendingRotationRef.current);
+      pendingRotationRef.current = null;
+    }
+    rafRef.current = null;
+  }
+
+  function scheduleRotation(next: [number, number]) {
+    pendingRotationRef.current = next;
+    if (rafRef.current === null) {
+      rafRef.current = requestAnimationFrame(flushPendingRotation);
+    }
+  }
+
+  useEffect(() => {
+    return () => {
+      if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
+    };
+  }, []);
+
   return (
     <div
-      className="relative h-[calc(100vh-56px)] md:h-screen w-full overflow-hidden"
+      className="relative h-[calc(100vh-56px)] md:h-screen w-full overflow-hidden touch-none"
+      style={{ cursor: dragRef.current ? "grabbing" : "grab" }}
+      onPointerDown={(e) => {
+        // Ignore clicks on pins — those open popovers.
+        if ((e.target as HTMLElement).closest("[data-pin]")) return;
+        (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+        dragRef.current = {
+          pointerId: e.pointerId,
+          startX: e.clientX,
+          startY: e.clientY,
+          startRotation: rotation,
+        };
+        setMode("user");
+      }}
+      onPointerMove={(e) => {
+        const drag = dragRef.current;
+        if (!drag || drag.pointerId !== e.pointerId) return;
+        const dx = e.clientX - drag.startX;
+        const dy = e.clientY - drag.startY;
+        const dLon = dx * (180 / (scale * GLOBE_BASE_RADIUS));
+        const dLat = -dy * (180 / (scale * GLOBE_BASE_RADIUS));
+        const nextLon = drag.startRotation[0] + dLon;
+        const nextLat = Math.max(-90, Math.min(90, drag.startRotation[1] + dLat));
+        scheduleRotation([nextLon, nextLat]);
+      }}
+      onPointerUp={(e) => {
+        const drag = dragRef.current;
+        if (!drag || drag.pointerId !== e.pointerId) return;
+        dragRef.current = null;
+      }}
+      onPointerCancel={() => {
+        dragRef.current = null;
+      }}
       onClick={(e) => {
         if ((e.target as HTMLElement).closest("[data-pin]")) return;
         setOpenPinId(null);
@@ -123,7 +185,7 @@ export function MapGlobe({
         <g>
           {countryPaths.map((d, i) => (
             <path
-              key={i}
+              key={`c-${i}-${d.length}`}
               d={d}
               fill="none"
               stroke="var(--fg-muted)"
@@ -135,7 +197,7 @@ export function MapGlobe({
         <g style={{ opacity: shouldShowStateBorders(scale) ? 0.6 : 0, transition: "opacity 150ms ease" }}>
           {statePaths.map((d, i) => (
             <path
-              key={i}
+              key={`s-${i}-${d.length}`}
               d={d}
               fill="none"
               stroke="var(--fg-muted)"
