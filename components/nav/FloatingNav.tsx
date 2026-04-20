@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { BookOpen, FileText, Home, Map } from "lucide-react";
+import { BookOpen, Home, Map } from "lucide-react";
 import type { ComponentType, SVGProps } from "react";
 import { NavIcon } from "./NavIcon";
 import { ThemeToggle } from "./ThemeToggle";
@@ -15,7 +15,6 @@ interface NavItem {
 
 const items: NavItem[] = [
   { href: "/", label: "Home", Icon: Home },
-  { href: "/resume", label: "Resume", Icon: FileText },
   { href: "/blog", label: "Blog", Icon: BookOpen },
   { href: "/map", label: "Map", Icon: Map },
 ];

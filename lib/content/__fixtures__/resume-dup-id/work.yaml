@@ -5,6 +5,7 @@
   start: "2026-01"
   end: null
   highlights: [h]
+  category: paid
 - id: dup
   org: B
   role: Y
@@ -12,3 +13,4 @@
   start: "2026-02"
   end: null
   highlights: [h2]
+  category: paid

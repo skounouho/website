@@ -10,6 +10,7 @@
     - "Built a shared-codebase React / React Native app (web + iOS) with a Python backend for real-time sports data ingestion and sub-second delivery under live-game latency requirements."
     - "Built GitHub Actions CI/CD workflows running AI-assisted code review and a full E2E test suite."
     - "Built a design-to-production pipeline (Google Stitch → v0 → Claude Code) automating the full loop from UI mockup to working frontend and backend code."
+  category: paid
   blog_slugs: []
   map_pin_ids: [nyc]
 
@@ -26,6 +27,7 @@
     - "Improved generation speed by over 100× compared to the research group's previous approach."
     - "Scaled deployment to 980 massively-parallel simulations, delivering predictions for a manufactured part."
     - "Co-authored a paper (in-review, Advances in Engineering Software) on simulating uncertainty in additive manufacturing."
+  category: paid
   blog_slugs: []
   map_pin_ids: [lemont]
 
@@ -40,6 +42,7 @@
     - "Developed novel computational methods for uncertainty quantification in atomic-level phase changes; published in a top-tier journal (CMAME, IF 7.3, 5 citations)."
     - "Built and validated a novel sensitivity-analysis framework for evaluating model-choice impact in dynamical systems."
     - "Presented previous and ongoing research at two international conferences (WCCM 2024 and USNCCM 2025)."
+  category: paid
   blog_slugs: []
   map_pin_ids: [durham]
 
@@ -54,6 +57,7 @@
     - "Built a high-throughput simulation toolkit for polymer modeling and verification, handling thousands of parallel runs across diverse material systems."
     - "Developed a novel principal-component-analysis method for polymer gel network simulation using Python and MATLAB."
     - "Co-authored a paper (in-review, Journal of Chemical Theory and Computation) on machine learning in multi-fidelity polymer simulations."
+  category: paid
   blog_slugs: []
   map_pin_ids: [albuquerque]
 
@@ -68,6 +72,7 @@
     - "Created a C++ software package for linear reduced-order modeling of nanoscale characterization simulations for metals."
     - "Applied and validated the algorithms on graphene and aluminum lattice simulations using LAMMPS."
     - "Leveraged the fix to run simulations of over 100,000 atoms to model energy surfaces in nano-films."
+  category: paid
   blog_slugs: []
   map_pin_ids: [albuquerque]
 
@@ -80,6 +85,7 @@
   end: "2025-12"
   highlights:
     - "Student co-instructor for a house course on energy and climate investing."
+  category: teaching-other
   blog_slugs: []
   map_pin_ids: [durham]
 
@@ -92,6 +98,7 @@
   end: "2025-12"
   highlights:
     - "Undergraduate teaching assistant for ME 336 (Introduction to Fluid Mechanics) at Duke University."
+  category: teaching-other
   blog_slugs: []
   map_pin_ids: [durham]
 
@@ -104,6 +111,7 @@
   end: "2024-05"
   highlights:
     - "Designed and led a student-taught house course on philanthropy in Durham with advisor Rev. Sam Miglarese."
+  category: teaching-other
   blog_slugs: []
   map_pin_ids: [durham]
 
@@ -116,6 +124,7 @@
   end: "2024-05"
   highlights:
     - "Undergraduate teaching assistant across two semesters of Duke's core data structures course."
+  category: teaching-other
   blog_slugs: []
   map_pin_ids: [durham]
 
@@ -128,6 +137,7 @@
   end: "2025-05"
   highlights:
     - "Resident Assistant at Randolph Dormitory, Duke University."
+  category: teaching-other
   blog_slugs: []
   map_pin_ids: [durham]
 
@@ -140,5 +150,6 @@
   org_url: https://www.dukechronicle.com
   highlights:
     - "Senior Reporter for The Chronicle, Duke University's student newspaper."
+  category: teaching-other
   blog_slugs: []
   map_pin_ids: [durham]
