@@ -161,6 +161,21 @@ export function MapGlobe({
   }>({ pointers: new Map(), startDistance: null, startScale: 1 });
   const flyRafRef = useRef<number | null>(null);
   const driftRafRef = useRef<number | null>(null);
+  const globeCircleRef = useRef<SVGCircleElement | null>(null);
+  // Tracks whether the most recent pointerdown landed on the globe, so that
+  // the synthesized click at pointerup doesn't trigger "resume auto" when
+  // the user was dragging the globe (especially drag-release off-sphere).
+  const pointerDownOnGlobeRef = useRef<boolean>(false);
+
+  function isPointerOnGlobe(clientX: number, clientY: number): boolean {
+    const el = globeCircleRef.current;
+    if (!el) return false;
+    const rect = el.getBoundingClientRect();
+    const cx = rect.left + rect.width / 2;
+    const cy = rect.top + rect.height / 2;
+    const r = rect.width / 2;
+    return Math.hypot(clientX - cx, clientY - cy) <= r;
+  }
 
   function cancelFly() {
     if (flyRafRef.current !== null) {
@@ -263,7 +278,6 @@ export function MapGlobe({
     <div
       tabIndex={0}
       className="relative h-[calc(100vh-56px)] md:h-screen w-full overflow-hidden touch-none outline-none focus-visible:ring-1 focus-visible:ring-[var(--fg-muted)] focus-visible:ring-inset"
-      style={{ cursor: dragRef.current ? "grabbing" : "grab" }}
       onKeyDown={(e) => {
         if (e.metaKey || e.ctrlKey) return;
         const STEP = 5;           // degrees per arrow key
@@ -315,6 +329,9 @@ export function MapGlobe({
       onPointerDown={(e) => {
         // Ignore clicks on pins — those open popovers.
         if ((e.target as HTMLElement).closest("[data-pin]")) return;
+        const onGlobe = isPointerOnGlobe(e.clientX, e.clientY);
+        pointerDownOnGlobeRef.current = onGlobe;
+        if (!onGlobe) return;
         cancelFly();
         cancelDrift();
         (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
@@ -410,6 +427,7 @@ export function MapGlobe({
       // no scrollable ancestor. If a future layout introduces one, switch to a
       // non-passive listener via ref.addEventListener("wheel", ..., { passive: false }).
       onWheel={(e) => {
+        if (!isPointerOnGlobe(e.clientX, e.clientY)) return;
         e.preventDefault();
         cancelFly();
         cancelDrift();
@@ -420,6 +438,16 @@ export function MapGlobe({
       onClick={(e) => {
         if ((e.target as HTMLElement).closest("[data-pin]")) return;
         setOpenPinId(null);
+        // If pointerdown started on the globe, this click terminates a drag
+        // (possibly released off-sphere); don't treat it as "click outside".
+        const startedOnGlobe = pointerDownOnGlobeRef.current;
+        pointerDownOnGlobeRef.current = false;
+        if (startedOnGlobe) return;
+        if (!isPointerOnGlobe(e.clientX, e.clientY)) {
+          cancelFly();
+          cancelDrift();
+          setMode("auto");
+        }
       }}
     >
       <svg
@@ -429,6 +457,7 @@ export function MapGlobe({
         aria-label="Interactive globe showing places I've lived, worked, and visited."
       >
         <circle
+          ref={globeCircleRef}
           cx={GLOBE_WIDTH / 2}
           cy={GLOBE_HEIGHT / 2}
           r={GLOBE_BASE_RADIUS * scale}
@@ -436,6 +465,7 @@ export function MapGlobe({
           stroke="var(--fg-muted)"
           strokeWidth={0.5}
           vectorEffect="non-scaling-stroke"
+          className="cursor-grab active:cursor-grabbing"
         />
         <g>
           {countryPaths.map((d, i) => (
