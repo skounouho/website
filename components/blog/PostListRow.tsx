@@ -23,7 +23,7 @@ export function PostListRow({ post }: { post: BlogPost }) {
             </span>
           ) : null}
         </span>
-        <span className="font-serif text-[20px] transition-colors motion-safe:duration-[var(--duration-fast)] group-hover:text-[var(--accent)]">
+        <span className="font-sans text-[20px] transition-colors motion-safe:duration-[var(--duration-fast)] group-hover:text-[var(--accent)]">
           {post.title}
         </span>
       </Link>

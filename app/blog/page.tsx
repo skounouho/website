@@ -14,7 +14,7 @@ export default function BlogIndex() {
 
   return (
     <div className="mx-auto max-w-[65ch] px-6 py-24">
-      <h1 className="font-sans mb-12 text-[28px] font-bold">
+      <h1 className="font-sans mb-12 text-[36px] font-bold">
         Writing
       </h1>
       <ul className="flex flex-col gap-3">
