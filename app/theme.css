@@ -16,6 +16,10 @@
   --font-sans: "Lato", system-ui, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
 
+  --space-page-y: 6rem;
+  --space-section: 5rem;
+  --space-block: 2.5rem;
+
   --ease-standard: cubic-bezier(0.2, 0, 0, 1);
   --duration-fast: 120ms;
   --duration-medium: 220ms;

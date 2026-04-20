@@ -95,14 +95,14 @@ html[data-theme="dark"] .shiki span {
   font-weight: 700;
   font-size: 24px;
   line-height: 1.25;
-  margin: 2.5rem 0 1rem;
+  margin: var(--space-section) 0 1rem;
 }
 .prose-site h3 {
   font-family: var(--font-sans);
   font-weight: 700;
   font-size: 20px;
   line-height: 1.3;
-  margin: 2rem 0 0.75rem;
+  margin: var(--space-block) 0 0.75rem;
 }
 .prose-site p {
   margin: 1rem 0;
@@ -124,7 +124,7 @@ html[data-theme="dark"] .shiki span {
 .prose-site hr {
   border: 0;
   border-top: 1px solid var(--border);
-  margin: 3rem 0;
+  margin: var(--space-section) 0;
 }
 .prose-site table {
   width: 100%;

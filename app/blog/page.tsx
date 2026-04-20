@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { getBlogPosts } from "@/lib/content";
 import { PostListRow } from "@/components/blog/PostListRow";
+import { PageContainer } from "@/components/layout/PageContainer";
 
 export const metadata: Metadata = {
   title: "Writing",
@@ -13,8 +14,8 @@ export default function BlogIndex() {
   );
 
   return (
-    <div className="mx-auto max-w-[65ch] px-6 py-24">
-      <h1 className="font-sans mb-12 text-[36px] font-bold">
+    <PageContainer>
+      <h1 className="font-sans mb-[var(--space-section)] text-[36px] font-bold">
         Writing
       </h1>
       <ul className="flex flex-col gap-3">
@@ -22,6 +23,6 @@ export default function BlogIndex() {
           <PostListRow key={post.slug} post={post} />
         ))}
       </ul>
-    </div>
+    </PageContainer>
   );
 }

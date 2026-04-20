@@ -9,7 +9,7 @@ export function PostFooter({
   places: MapPin[];
 }) {
   return (
-    <footer className="mt-16 border-t pt-10" style={{ borderColor: "var(--border)" }}>
+    <footer className="mt-[var(--space-section)] border-t pt-[var(--space-block)]" style={{ borderColor: "var(--border)" }}>
       {post.tags.length > 0 ? (
         <ul className="mb-6 flex flex-wrap gap-2">
           {post.tags.map((tag) => (
