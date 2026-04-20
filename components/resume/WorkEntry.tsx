@@ -19,49 +19,55 @@ export function WorkEntry({
     .filter((p): p is MapPin => Boolean(p));
 
   return (
-    <article className="space-y-3">
-      <h3 className="font-sans text-[20px] font-bold leading-tight">
-        {entry.role}
-      </h3>
-      <div className="font-serif text-sm" style={{ color: "var(--fg-muted)" }}>
-        {entry.org_url ? (
-          <a href={entry.org_url} target="_blank" rel="noopener noreferrer">
-            {entry.org}
-          </a>
-        ) : (
-          <span>{entry.org}</span>
-        )}
-        {" · "}
-        {entry.location}
-        {" · "}
-        {formatYearMonthRange(entry.start, entry.end)}
-      </div>
-      <ul className="list-disc space-y-1 pl-5">
-        {entry.highlights.map((h, i) => (
-          <li key={i}>{h}</li>
-        ))}
-      </ul>
-      {(relatedPosts.length > 0 || relatedPins.length > 0) && (
-        <div className="text-sm" style={{ color: "var(--fg-muted)" }}>
-          <span className="font-sans">Related: </span>
-          {[
-            ...relatedPosts.map((p) => (
-              <Link key={`p-${p.slug}`} href={`/blog/${p.slug}`}>
-                {p.title}
-              </Link>
-            )),
-            ...relatedPins.map((p) => (
-              <Link key={`m-${p.id}`} href={`/map#${p.id}`}>
-                {p.name}
-              </Link>
-            )),
-          ].reduce<React.ReactNode[]>(
-            (acc, node, i) =>
-              i === 0 ? [node] : [...acc, " · ", node],
-            [],
+    <article>
+      <details className="group/work">
+        <summary className="list-none cursor-pointer space-y-2 [&::-webkit-details-marker]:hidden">
+          <h3 className="font-sans text-[20px] font-bold leading-tight transition-colors duration-[var(--duration-fast)] ease-[var(--ease-standard)] group-hover/work:text-[color:var(--accent)]">
+            {entry.role}
+          </h3>
+          <div className="font-serif text-sm" style={{ color: "var(--fg-muted)" }}>
+            {entry.org_url ? (
+              <a href={entry.org_url} target="_blank" rel="noopener noreferrer">
+                {entry.org}
+              </a>
+            ) : (
+              <span>{entry.org}</span>
+            )}
+            {" · "}
+            {entry.location}
+            {" · "}
+            {formatYearMonthRange(entry.start, entry.end)}
+          </div>
+        </summary>
+        <div className="mt-3 space-y-3">
+          <ul className="list-disc space-y-1 pl-5">
+            {entry.highlights.map((h, i) => (
+              <li key={i}>{h}</li>
+            ))}
+          </ul>
+          {(relatedPosts.length > 0 || relatedPins.length > 0) && (
+            <div className="text-sm" style={{ color: "var(--fg-muted)" }}>
+              <span className="font-sans">Related: </span>
+              {[
+                ...relatedPosts.map((p) => (
+                  <Link key={`p-${p.slug}`} href={`/blog/${p.slug}`}>
+                    {p.title}
+                  </Link>
+                )),
+                ...relatedPins.map((p) => (
+                  <Link key={`m-${p.id}`} href={`/map#${p.id}`}>
+                    {p.name}
+                  </Link>
+                )),
+              ].reduce<React.ReactNode[]>(
+                (acc, node, i) =>
+                  i === 0 ? [node] : [...acc, " · ", node],
+                [],
+              )}
+            </div>
           )}
         </div>
-      )}
+      </details>
     </article>
   );
 }
