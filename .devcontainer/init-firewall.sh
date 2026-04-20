@@ -36,6 +36,8 @@ iptables -A INPUT -p tcp --sport 22 -m state --state ESTABLISHED -j ACCEPT
 # Allow localhost
 iptables -A INPUT -i lo -j ACCEPT
 iptables -A OUTPUT -o lo -j ACCEPT
+# Allow inbound to local dev server (Next.js) so host port-forwarding works
+iptables -A INPUT -p tcp --dport 3000 -m conntrack --ctstate NEW,ESTABLISHED -j ACCEPT
 
 # Create ipset with CIDR support
 ipset create allowed-domains hash:net
