@@ -4,6 +4,7 @@ import { getBlogPost, getBlogPosts, getPin } from "@/lib/content";
 import { renderMdx } from "@/lib/content/mdx";
 import { PostHeader } from "@/components/blog/PostHeader";
 import { PostFooter } from "@/components/blog/PostFooter";
+import { PageContainer } from "@/components/layout/PageContainer";
 
 export function generateStaticParams() {
   return getBlogPosts()
@@ -42,12 +43,12 @@ export default async function BlogPostPage(props: {
     .filter((p): p is NonNullable<typeof p> => p !== null);
 
   return (
-    <div className="mx-auto max-w-[65ch] px-6 py-24">
+    <PageContainer>
       <article>
         <PostHeader post={post} />
         <div className="prose-site">{renderMdx(post.body)}</div>
         <PostFooter post={post} places={places} />
       </article>
-    </div>
+    </PageContainer>
   );
 }

@@ -3,7 +3,7 @@ import { formatPostDate } from "@/lib/format";
 
 export function PostHeader({ post }: { post: BlogPost }) {
   return (
-    <header className="mb-10">
+    <header className="mb-[var(--space-block)]">
       <div className="font-serif text-sm" style={{ color: "var(--fg-muted)" }}>
         {formatPostDate(post.date)}
       </div>
