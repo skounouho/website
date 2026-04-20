@@ -403,7 +403,7 @@ export function MapGlobe({
               <circle
                 cx={x}
                 cy={y}
-                r={10}
+                r={8}
                 fill="none"
                 stroke="var(--fg-muted)"
                 strokeWidth={1.5}
@@ -415,10 +415,10 @@ export function MapGlobe({
                 data-pin={pin.id}
                 cx={x}
                 cy={y}
-                r={6}
+                r={4.8}
                 fill="var(--accent)"
                 stroke="var(--bg)"
-                strokeWidth={2}
+                strokeWidth={1.6}
                 onClick={(e) => {
                   e.stopPropagation();
                   if (openPinId === pin.id) {
