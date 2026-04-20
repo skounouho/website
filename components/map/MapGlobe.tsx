@@ -5,6 +5,7 @@ import type { ExtendedFeatureCollection } from "d3-geo";
 import { feature } from "topojson-client";
 import type { GeometryCollection, Topology } from "topojson-specification";
 import type { MapPin } from "@/lib/content";
+import { clusterPins, type PinCluster } from "@/lib/cluster";
 import {
   createGlobeProjection,
   pathsFromGeojson,
@@ -59,7 +60,9 @@ export function MapGlobe({
   const [mode, setMode] = useState<"auto" | "user" | "flying">(
     prefersReducedMotion ? "user" : "auto",
   );
-  const [openPinId, setOpenPinId] = useState<string | null>(null);
+  const [openClusterId, setOpenClusterId] = useState<string | null>(null);
+
+  const clusters = useMemo(() => clusterPins(pins), [pins]);
 
   // Materialize features from topology once on the client. Shipping the raw
   // TopoJSON (arc-encoded, shared boundaries) rather than the expanded
@@ -81,7 +84,7 @@ export function MapGlobe({
     [statesTopo],
   );
 
-  const { countryPaths, statePaths, projectedPins } = useMemo(() => {
+  const { countryPaths, statePaths, projectedClusters } = useMemo(() => {
     const projection = createGlobeProjection({
       width: GLOBE_WIDTH,
       height: GLOBE_HEIGHT,
@@ -98,21 +101,23 @@ export function MapGlobe({
     const statePaths = shouldShowStateBorders(scale)
       ? pathsFromGeojson(stateFeatures, projection)
       : [];
-    const projectedPins = pins
-      .map((pin) => {
-        const xy = projection([pin.lon, pin.lat]);
+    const projectedClusters = clusters
+      .map((cluster) => {
+        const xy = projection([cluster.lon, cluster.lat]);
         if (!xy) return null;
-        if (!isPinVisible(pin, rotation)) return null;
-        return { pin, x: xy[0], y: xy[1] };
+        if (!isPinVisible(cluster, rotation)) return null;
+        return { cluster, x: xy[0], y: xy[1] };
       })
-      .filter((p): p is { pin: MapPin; x: number; y: number } => p !== null);
-    return { countryPaths, statePaths, projectedPins };
+      .filter(
+        (p): p is { cluster: PinCluster; x: number; y: number } => p !== null,
+      );
+    return { countryPaths, statePaths, projectedClusters };
   }, [
     rotation,
     scale,
     worldFeatures,
     stateFeatures,
-    pins,
+    clusters,
     initialCountryPaths,
     initialRotation,
     initialScale,
@@ -120,7 +125,7 @@ export function MapGlobe({
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
-      if (e.key === "Escape") setOpenPinId(null);
+      if (e.key === "Escape") setOpenClusterId(null);
     }
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
@@ -143,18 +148,20 @@ export function MapGlobe({
     const route = () => {
       const hash = window.location.hash.slice(1);
       if (!hash) return;
-      const pin = pins.find((p) => p.id === hash);
-      if (!pin) return;
+      const cluster = clusters.find((c) =>
+        c.pins.some((p) => p.id === hash),
+      );
+      if (!cluster) return;
       if (prefersReducedMotion) {
         cancelDrift();
-        const target = flyToTarget(pin);
+        const target = flyToTarget(cluster);
         setRotation(target.rotation);
         setScale(target.scale);
         setMode("user");
-        setOpenPinId(pin.id);
+        setOpenClusterId(cluster.id);
       } else {
-        setOpenPinId(null);
-        startFlyTo(pin, () => setOpenPinId(pin.id));
+        setOpenClusterId(null);
+        startFlyTo(cluster, () => setOpenClusterId(cluster.id));
       }
     };
 
@@ -165,9 +172,10 @@ export function MapGlobe({
     // which is what we want — it should tween from wherever the globe is
     // when the hash fires.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pins, prefersReducedMotion]);
+  }, [clusters, prefersReducedMotion]);
 
-  const openPin = projectedPins.find((p) => p.pin.id === openPinId) ?? null;
+  const openCluster =
+    projectedClusters.find((p) => p.cluster.id === openClusterId) ?? null;
 
   const dragRef = useRef<{
     pointerId: number;
@@ -236,10 +244,13 @@ export function MapGlobe({
     driftRafRef.current = requestAnimationFrame(tick);
   }
 
-  function startFlyTo(pin: MapPin, onComplete?: () => void) {
+  function startFlyTo(
+    target_: { lat: number; lon: number },
+    onComplete?: () => void,
+  ) {
     cancelFly();
     cancelDrift();
-    const target = flyToTarget(pin);
+    const target = flyToTarget(target_);
     const startRotation = rotation;
     const startScale = scale;
     const startTime = performance.now();
@@ -462,7 +473,7 @@ export function MapGlobe({
       }}
       onClick={(e) => {
         if ((e.target as HTMLElement).closest("[data-pin]")) return;
-        setOpenPinId(null);
+        setOpenClusterId(null);
         // If pointerdown started on the globe, this click terminates a drag
         // (possibly released off-sphere); don't treat it as "click outside".
         const startedOnGlobe = pointerDownOnGlobeRef.current;
@@ -517,12 +528,12 @@ export function MapGlobe({
           ))}
         </g>
         <g>
-          {projectedPins.map(({ pin, x, y }) => (
+          {projectedClusters.map(({ cluster, x, y }) => (
             <g
-              key={pin.id}
+              key={cluster.id}
               tabIndex={0}
               role="button"
-              aria-label={pin.name}
+              aria-label={cluster.name}
               className="group outline-none"
               style={{ cursor: "pointer" }}
               onKeyDown={(e) => {
@@ -530,7 +541,7 @@ export function MapGlobe({
                   e.preventDefault();
                   e.stopPropagation();
                   (document.querySelector(
-                    `[data-pin="${pin.id}"]`,
+                    `[data-pin="${cluster.id}"]`,
                   ) as SVGCircleElement | null)?.dispatchEvent(
                     new MouseEvent("click", { bubbles: true }),
                   );
@@ -549,7 +560,7 @@ export function MapGlobe({
                 aria-hidden="true"
               />
               <circle
-                data-pin={pin.id}
+                data-pin={cluster.id}
                 cx={x}
                 cy={y}
                 r={4.8}
@@ -558,22 +569,22 @@ export function MapGlobe({
                 strokeWidth={1.6}
                 onClick={(e) => {
                   e.stopPropagation();
-                  if (openPinId === pin.id) {
-                    setOpenPinId(null);
+                  if (openClusterId === cluster.id) {
+                    setOpenClusterId(null);
                     return;
                   }
                   if (prefersReducedMotion) {
                     cancelDrift();
-                    const target = flyToTarget(pin);
+                    const target = flyToTarget(cluster);
                     setRotation(target.rotation);
                     setScale(target.scale);
                     setMode("user");
-                    setOpenPinId(pin.id);
+                    setOpenClusterId(cluster.id);
                     return;
                   }
                   // Close any existing popover before flying.
-                  setOpenPinId(null);
-                  startFlyTo(pin, () => setOpenPinId(pin.id));
+                  setOpenClusterId(null);
+                  startFlyTo(cluster, () => setOpenClusterId(cluster.id));
                 }}
               />
             </g>
@@ -581,12 +592,12 @@ export function MapGlobe({
         </g>
       </svg>
 
-      {openPin ? (
+      {openCluster ? (
         <PinPopover
-          pin={openPin.pin}
-          x={(openPin.x / GLOBE_WIDTH) * 100}
-          y={(openPin.y / GLOBE_HEIGHT) * 100}
-          onClose={() => setOpenPinId(null)}
+          cluster={openCluster.cluster}
+          x={(openCluster.x / GLOBE_WIDTH) * 100}
+          y={(openCluster.y / GLOBE_HEIGHT) * 100}
+          onClose={() => setOpenClusterId(null)}
         />
       ) : null}
     </div>
