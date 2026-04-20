@@ -91,6 +91,15 @@ details[open]::details-content {
   block-size: auto;
 }
 
+/* Some browsers skip the first transition after [open] is applied unless
+   a starting-style is declared explicitly. */
+@starting-style {
+  details[open]::details-content {
+    opacity: 0;
+    block-size: 0;
+  }
+}
+
 /* KaTeX follows theme */
 .katex,
 .katex * {
