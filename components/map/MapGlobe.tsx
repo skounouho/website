@@ -19,6 +19,7 @@ import {
 } from "@/lib/projection";
 import { cubicBezierEase, lerpRotation, lerpScale } from "@/lib/tween";
 import { PinPopover } from "./PinPopover";
+import { usePrefersReducedMotion } from "./hooks/usePrefersReducedMotion";
 
 export type WorldTopology = Topology<{ countries: GeometryCollection }>;
 export type StatesTopology = Topology<{ states: GeometryCollection }>;
@@ -607,14 +608,4 @@ export function MapGlobe({
       ) : null}
     </div>
   );
-}
-
-function usePrefersReducedMotion(): boolean {
-  // Read on mount. Not reactive to changes — matches the site's
-  // other motion-gated features (MapSwitcher used the same pattern).
-  const [reduced] = useState<boolean>(() => {
-    if (typeof window === "undefined") return false;
-    return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  });
-  return reduced;
 }
