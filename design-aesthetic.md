@@ -58,10 +58,19 @@ Animation should serve a clear purpose — it is not decorative. The appropriate
 
 ## Links & Hover States
 
-- Default state: underlined, body/UI color
-- Hover state: underline retained, color shifts to muted accent, weight increases
+Two modes, depending on context:
+
+**Prose links** — inline links inside long-form reading (blog posts, the about page, MDX bodies wrapped in `.prose-site`):
+- Default state: underlined, body color
+- Hover state: underline retained, color shifts to muted accent
 - Transition: `100–150ms ease`
-- No color-only differentiation (underline always present for accessibility)
+- The always-visible underline keeps dense inline link runs legible and accessible.
+
+**UI-chrome links** — standalone or structural links outside prose (nav labels, resume metadata, blog list rows, map popovers, footers, cards):
+- Default state: no underline, inherits surrounding text color (often `--fg-muted` when the link sits in metadata-style text)
+- Hover state: color shifts to muted accent, no underline added
+- Transition: `100–150ms ease`
+- Matches the side-nav label pattern — a quiet color shift does the work, keeping the chrome uncluttered.
 
 ---
 

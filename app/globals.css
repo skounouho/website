@@ -49,14 +49,22 @@ body {
 @layer base {
   a {
     color: inherit;
-    text-decoration: underline;
-    text-decoration-thickness: 1px;
-    text-underline-offset: 2px;
+    text-decoration: none;
     transition: color var(--duration-fast) var(--ease-standard);
   }
   a:hover {
     color: var(--accent);
   }
+}
+
+/* Prose links keep underlines — inline link density in long-form reading
+   needs the always-visible affordance. UI-chrome links (nav, resume,
+   popovers, cards) drop the underline and rely on the color shift, matching
+   the side-nav label pattern. */
+.prose-site a {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
 }
 
 /* KaTeX follows theme */
