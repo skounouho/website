@@ -69,6 +69,20 @@ export function WorkEntry({
                 )}
             </div>
           )}
+          {entry.articles.length > 0 && (
+            <div className="text-sm" style={{ color: "var(--fg-muted)" }}>
+              <div className="font-sans mb-1">Selected articles</div>
+              <ul className="space-y-1">
+                {entry.articles.map((a) => (
+                  <li key={a.url}>
+                    <a href={a.url} target="_blank" rel="noopener noreferrer">
+                      {a.title}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
         </div>
       </details>
     </article>
