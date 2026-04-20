@@ -14,9 +14,10 @@ export function WorkEntry({
   const relatedPosts = entry.blog_slugs
     .map((slug) => posts.find((p) => p.slug === slug))
     .filter((p): p is BlogPost => Boolean(p));
-  const relatedPins = entry.map_pin_ids
-    .map((id) => pins.find((p) => p.id === id))
-    .filter((p): p is MapPin => Boolean(p));
+  const locationPin =
+    entry.map_pin_ids
+      .map((id) => pins.find((p) => p.id === id))
+      .find((p): p is MapPin => Boolean(p)) ?? null;
 
   return (
     <article>
@@ -37,7 +38,11 @@ export function WorkEntry({
               <span>{entry.org}</span>
             )}
             {" · "}
-            {entry.location}
+            {locationPin ? (
+              <Link href={`/map#${locationPin.id}`}>{entry.location}</Link>
+            ) : (
+              entry.location
+            )}
             {" · "}
             {formatYearMonthRange(entry.start, entry.end)}
           </div>
@@ -48,25 +53,20 @@ export function WorkEntry({
               <li key={i}>{h}</li>
             ))}
           </ul>
-          {(relatedPosts.length > 0 || relatedPins.length > 0) && (
+          {relatedPosts.length > 0 && (
             <div className="text-sm" style={{ color: "var(--fg-muted)" }}>
               <span className="font-sans">Related: </span>
-              {[
-                ...relatedPosts.map((p) => (
+              {relatedPosts
+                .map((p) => (
                   <Link key={`p-${p.slug}`} href={`/blog/${p.slug}`}>
                     {p.title}
                   </Link>
-                )),
-                ...relatedPins.map((p) => (
-                  <Link key={`m-${p.id}`} href={`/map#${p.id}`}>
-                    {p.name}
-                  </Link>
-                )),
-              ].reduce<React.ReactNode[]>(
-                (acc, node, i) =>
-                  i === 0 ? [node] : [...acc, " · ", node],
-                [],
-              )}
+                ))
+                .reduce<React.ReactNode[]>(
+                  (acc, node, i) =>
+                    i === 0 ? [node] : [...acc, " · ", node],
+                  [],
+                )}
             </div>
           )}
         </div>
