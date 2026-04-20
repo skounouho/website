@@ -14,32 +14,33 @@ interface Props {
   viewBox: string;
   width: number;
   height: number;
-  countryPaths: string[];
+  regionPaths: string[];
   pins: ProjectedPin[];
+  ariaLabel: string;
 }
 
 export function MapCanvas({
   viewBox,
   width,
   height,
-  countryPaths,
+  regionPaths,
   pins,
+  ariaLabel,
 }: Props) {
   const [openId, setOpenId] = useState<string | null>(null);
   const [shiftX, setShiftX] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Hash linking: open the matching pin on mount.
+  // Hash linking: open the matching pin on mount. If this canvas has no
+  // matching pin we stay silent — a sibling canvas on the same page may
+  // own the id, so we must not clear or steal the hash.
   useEffect(() => {
     if (typeof window === "undefined") return;
     const tryOpen = () => {
       const hash = window.location.hash.slice(1);
       if (!hash) return;
       const match = pins.find((p) => p.pin.id === hash);
-      if (!match) {
-        history.replaceState(null, "", window.location.pathname);
-        return;
-      }
+      if (!match) return;
       setOpenId(match.pin.id);
       const el = containerRef.current;
       if (el) {
@@ -77,11 +78,11 @@ export function MapCanvas({
         viewBox={viewBox}
         className="absolute inset-0 h-full w-full transition-transform motion-safe:duration-[var(--duration-medium)]"
         style={{ transform: `translateX(${shiftX}px)` }}
-        aria-label="World map"
+        aria-label={ariaLabel}
         role="img"
       >
         <g>
-          {countryPaths.map((d, i) => (
+          {regionPaths.map((d, i) => (
             <path
               key={i}
               d={d}
