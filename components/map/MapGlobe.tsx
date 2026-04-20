@@ -2,6 +2,8 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { ExtendedFeatureCollection } from "d3-geo";
+import { feature } from "topojson-client";
+import type { GeometryCollection, Topology } from "topojson-specification";
 import type { MapPin } from "@/lib/content";
 import {
   createGlobeProjection,
@@ -18,6 +20,9 @@ import {
 import { cubicBezierEase, lerpRotation, lerpScale } from "@/lib/tween";
 import { PinPopover } from "./PinPopover";
 
+export type WorldTopology = Topology<{ countries: GeometryCollection }>;
+export type StatesTopology = Topology<{ states: GeometryCollection }>;
+
 const GLOBE_DURATION_MS = 750;
 const GLOBE_EASE = cubicBezierEase(0.2, 0, 0, 1);
 
@@ -33,8 +38,8 @@ const DRIFT_MIN_RELEASE_SPEED = 0.15;
 
 export interface MapGlobeProps {
   pins: MapPin[];
-  worldFeatures: ExtendedFeatureCollection;
-  stateFeatures: ExtendedFeatureCollection;
+  worldTopo: WorldTopology;
+  statesTopo: StatesTopology;
   initialRotation: [number, number];
   initialScale: number;
   initialCountryPaths: string[];
@@ -42,8 +47,8 @@ export interface MapGlobeProps {
 
 export function MapGlobe({
   pins,
-  worldFeatures,
-  stateFeatures,
+  worldTopo,
+  statesTopo,
   initialRotation,
   initialScale,
   initialCountryPaths,
@@ -55,6 +60,26 @@ export function MapGlobe({
     prefersReducedMotion ? "user" : "auto",
   );
   const [openPinId, setOpenPinId] = useState<string | null>(null);
+
+  // Materialize features from topology once on the client. Shipping the raw
+  // TopoJSON (arc-encoded, shared boundaries) rather than the expanded
+  // FeatureCollection roughly halves the /map RSC payload.
+  const worldFeatures = useMemo(
+    () =>
+      feature(
+        worldTopo,
+        worldTopo.objects.countries,
+      ) as unknown as ExtendedFeatureCollection,
+    [worldTopo],
+  );
+  const stateFeatures = useMemo(
+    () =>
+      feature(
+        statesTopo,
+        statesTopo.objects.states,
+      ) as unknown as ExtendedFeatureCollection,
+    [statesTopo],
+  );
 
   const { countryPaths, statePaths, projectedPins } = useMemo(() => {
     const projection = createGlobeProjection({
