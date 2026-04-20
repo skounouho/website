@@ -306,6 +306,9 @@ export function MapGlobe({
     };
   }, []);
 
+  // Non-passive wheel listener for zoom — JSX onWheel is passive in React, so
+  // preventDefault() there is a no-op. See scaleRef note above for why the
+  // handler is safe to subscribe once.
   useEffect(() => {
     const el = containerRef.current;
     if (!el) return;
