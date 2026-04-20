@@ -15,7 +15,8 @@
 
 - id: argonne-cobra
   org: Argonne National Laboratory
-  role: Junior Research Aide — Thermal and Structural Materials Modeling and Simulations
+  role: Junior Research Aide
+  subtitle: Thermal and Structural Materials Modeling and Simulations
   location: Lemont, IL
   start: "2025-05"
   end: "2025-08"
@@ -30,7 +31,8 @@
 
 - id: duke-uqcm-lab
   org: Duke University — Uncertainty Quantification in Computational Mechanics Lab
-  role: Undergraduate Researcher (advisor Prof. Johann Guilleminot)
+  role: Undergraduate Researcher
+  subtitle: Advised by Prof. Johann Guilleminot
   location: Durham, NC
   start: "2022-09"
   end: "2025-12"
@@ -43,7 +45,8 @@
 
 - id: sandia-cint-2024
   org: Sandia National Laboratories — Center for Integrated Nanotechnologies
-  role: Summer Research Intern (advisors Dr. Rémi Dingreville and Dr. Saaketh Desai)
+  role: Summer Research Intern
+  subtitle: Advised by Dr. Rémi Dingreville and Dr. Saaketh Desai
   location: Albuquerque, NM
   start: "2024-05"
   end: "2024-08"
@@ -56,7 +59,8 @@
 
 - id: sandia-cint-2023
   org: Sandia National Laboratories — Center for Integrated Nanotechnologies
-  role: Summer Research Intern (advisors Dr. Rémi Dingreville and Dr. Chongze Hu)
+  role: Summer Research Intern
+  subtitle: Advised by Dr. Rémi Dingreville and Dr. Chongze Hu
   location: Albuquerque, NM
   start: "2023-05"
   end: "2023-06"
@@ -69,7 +73,8 @@
 
 - id: duke-housecs59-fall25
   org: Duke University
-  role: Student Co-Instructor — HOUSECS 59 (Introduction to Energy and Climate Investing)
+  role: Student Co-Instructor
+  subtitle: HOUSECS 59 — Introduction to Energy and Climate Investing
   location: Durham, NC
   start: "2025-08"
   end: "2025-12"
@@ -80,7 +85,8 @@
 
 - id: duke-me336-ta
   org: Duke University — Dept. of Mechanical Engineering and Materials Science
-  role: Undergraduate Teaching Assistant — ME 336 (Introduction to Fluid Mechanics)
+  role: Undergraduate Teaching Assistant
+  subtitle: ME 336 — Introduction to Fluid Mechanics
   location: Durham, NC
   start: "2025-08"
   end: "2025-12"
@@ -91,7 +97,8 @@
 
 - id: duke-housecs59-spr24
   org: Duke University — Program in Education
-  role: Student Instructor — HOUSECS 59 (The Durham Giving Project)
+  role: Student Instructor
+  subtitle: HOUSECS 59 — The Durham Giving Project
   location: Durham, NC
   start: "2024-01"
   end: "2024-05"
@@ -102,7 +109,8 @@
 
 - id: duke-cs201-ta
   org: Duke University — Dept. of Computer Science
-  role: Undergraduate Teaching Assistant — COMPSCI 201 (Introduction to Data Structures and Algorithms)
+  role: Undergraduate Teaching Assistant
+  subtitle: COMPSCI 201 — Introduction to Data Structures and Algorithms
   location: Durham, NC
   start: "2023-08"
   end: "2024-05"
@@ -113,7 +121,8 @@
 
 - id: duke-randolph-ra
   org: Duke University
-  role: Resident Assistant — Randolph Dormitory
+  role: Resident Assistant
+  subtitle: Randolph Dormitory
   location: Durham, NC
   start: "2024-08"
   end: "2025-05"

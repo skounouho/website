@@ -49,13 +49,54 @@ body {
 @layer base {
   a {
     color: inherit;
-    text-decoration: underline;
-    text-decoration-thickness: 1px;
-    text-underline-offset: 2px;
+    text-decoration: none;
     transition: color var(--duration-fast) var(--ease-standard);
   }
   a:hover {
     color: var(--accent);
+  }
+}
+
+/* Prose links keep underlines — inline link density in long-form reading
+   needs the always-visible affordance. UI-chrome links (nav, resume,
+   popovers, cards) drop the underline and rely on the color shift, matching
+   the side-nav label pattern. */
+.prose-site a {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+}
+
+/* Animate <details> open/close. `interpolate-size: allow-keywords` lets
+   block-size: auto participate in a transition; `::details-content`
+   targets everything inside <details> except <summary>. Browsers without
+   ::details-content support fall back to instant open/close. Reduced-
+   motion users get 0ms via the duration custom properties in theme.css. */
+html {
+  interpolate-size: allow-keywords;
+}
+
+details::details-content {
+  opacity: 0;
+  block-size: 0;
+  overflow: clip;
+  transition:
+    content-visibility var(--duration-medium) allow-discrete,
+    opacity var(--duration-medium) var(--ease-standard),
+    block-size var(--duration-medium) var(--ease-standard);
+}
+
+details[open]::details-content {
+  opacity: 1;
+  block-size: auto;
+}
+
+/* Some browsers skip the first transition after [open] is applied unless
+   a starting-style is declared explicitly. */
+@starting-style {
+  details[open]::details-content {
+    opacity: 0;
+    block-size: 0;
   }
 }
 

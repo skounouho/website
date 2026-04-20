@@ -2,6 +2,7 @@
 
 import { Moon, Sun } from "lucide-react";
 import { useSyncExternalStore } from "react";
+import { NavIcon } from "./NavIcon";
 
 type Theme = "light" | "dark";
 
@@ -50,14 +51,9 @@ export function ThemeToggle() {
           /* ignore (private mode, etc.) */
         }
       }}
-      className="inline-flex h-6 w-6 items-center justify-center bg-transparent transition-colors motion-safe:duration-[var(--duration-medium)]"
-      style={{ color: "var(--fg-muted)" }}
+      className="group/nav-item inline-flex h-6 w-6 items-center justify-center bg-transparent text-[color:var(--fg-muted)] transition-colors duration-[var(--duration-fast)] ease-[var(--ease-standard)] hover:text-[color:var(--accent)]"
     >
-      {theme === "light" ? (
-        <Sun width={20} height={20} strokeWidth={1.5} />
-      ) : (
-        <Moon width={20} height={20} strokeWidth={1.5} />
-      )}
+      <NavIcon Icon={theme === "light" ? Sun : Moon} />
     </button>
   );
 }

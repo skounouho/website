@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { BookOpen, FileText, Home, Map } from "lucide-react";
 import type { ComponentType, SVGProps } from "react";
+import { NavIcon } from "./NavIcon";
 import { ThemeToggle } from "./ThemeToggle";
 
 interface NavItem {
@@ -41,7 +42,7 @@ export function FloatingNav() {
                 <Link
                   href={href}
                   aria-current={active ? "page" : undefined}
-                  className="group/item flex items-center gap-3 no-underline text-[color:var(--fg-muted)] hover:text-[color:var(--accent)] aria-[current=page]:text-[color:var(--accent)] transition-colors duration-[var(--duration-fast)] ease-[var(--ease-standard)]"
+                  className="group/nav-item flex items-center gap-3 no-underline text-[color:var(--fg-muted)] hover:text-[color:var(--accent)] aria-[current=page]:text-[color:var(--accent)] transition-colors duration-[var(--duration-fast)] ease-[var(--ease-standard)]"
                   onClick={(e) => {
                     // Pointer/touch activations: drop focus so :focus-within
                     // doesn't keep the nav expanded post-navigation. Keyboard
@@ -51,12 +52,7 @@ export function FloatingNav() {
                     if (e.detail > 0) e.currentTarget.blur();
                   }}
                 >
-                  <Icon
-                    width={20}
-                    height={20}
-                    strokeWidth={1.5}
-                    className="transition-[stroke-width] duration-[var(--duration-fast)] ease-[var(--ease-standard)] group-hover/item:stroke-2"
-                  />
+                  <NavIcon Icon={Icon} />
                   <span className="font-sans text-sm opacity-0 transition-opacity motion-safe:duration-[var(--duration-medium)] ease-[var(--ease-standard)] group-hover:opacity-100 group-focus-within:opacity-100">
                     {label}
                   </span>
@@ -91,9 +87,9 @@ export function FloatingNav() {
               href={href}
               aria-current={active ? "page" : undefined}
               aria-label={label}
-              className="flex h-full flex-1 items-center justify-center no-underline text-[color:var(--fg-muted)] aria-[current=page]:text-[color:var(--accent)]"
+              className="group/nav-item flex h-full flex-1 items-center justify-center no-underline text-[color:var(--fg-muted)] transition-colors duration-[var(--duration-fast)] ease-[var(--ease-standard)] hover:text-[color:var(--accent)] aria-[current=page]:text-[color:var(--accent)]"
             >
-              <Icon width={22} height={22} strokeWidth={1.5} />
+              <NavIcon Icon={Icon} size={22} />
             </Link>
           );
         })}
