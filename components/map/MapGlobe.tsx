@@ -219,8 +219,50 @@ export function MapGlobe({
 
   return (
     <div
-      className="relative h-[calc(100vh-56px)] md:h-screen w-full overflow-hidden touch-none"
+      tabIndex={0}
+      className="relative h-[calc(100vh-56px)] md:h-screen w-full overflow-hidden touch-none outline-none"
       style={{ cursor: dragRef.current ? "grabbing" : "grab" }}
+      onKeyDown={(e) => {
+        const STEP = 5;           // degrees per arrow key
+        const ZOOM_FACTOR = 1.2;  // multiplicative per +/-
+        if (e.key === "ArrowLeft") {
+          e.preventDefault();
+          cancelFly();
+          setMode("user");
+          setRotation(([lon, lat]) => [lon - STEP, lat]);
+        } else if (e.key === "ArrowRight") {
+          e.preventDefault();
+          cancelFly();
+          setMode("user");
+          setRotation(([lon, lat]) => [lon + STEP, lat]);
+        } else if (e.key === "ArrowUp") {
+          e.preventDefault();
+          cancelFly();
+          setMode("user");
+          setRotation(([lon, lat]) => [
+            lon,
+            Math.max(-90, Math.min(90, lat + STEP)),
+          ]);
+        } else if (e.key === "ArrowDown") {
+          e.preventDefault();
+          cancelFly();
+          setMode("user");
+          setRotation(([lon, lat]) => [
+            lon,
+            Math.max(-90, Math.min(90, lat - STEP)),
+          ]);
+        } else if (e.key === "+" || e.key === "=") {
+          e.preventDefault();
+          cancelFly();
+          setMode("user");
+          setScale((s) => Math.max(SCALE_MIN, Math.min(SCALE_MAX, s * ZOOM_FACTOR)));
+        } else if (e.key === "-") {
+          e.preventDefault();
+          cancelFly();
+          setMode("user");
+          setScale((s) => Math.max(SCALE_MIN, Math.min(SCALE_MAX, s / ZOOM_FACTOR)));
+        }
+      }}
       onPointerDown={(e) => {
         // Ignore clicks on pins — those open popovers.
         if ((e.target as HTMLElement).closest("[data-pin]")) return;
@@ -334,36 +376,52 @@ export function MapGlobe({
         </g>
         <g>
           {projectedPins.map(({ pin, x, y }) => (
-            <circle
+            <g
               key={pin.id}
-              data-pin={pin.id}
-              cx={x}
-              cy={y}
-              r={6}
-              fill="var(--accent)"
-              stroke="var(--bg)"
-              strokeWidth={2}
-              style={{ cursor: "pointer" }}
+              tabIndex={0}
+              role="button"
               aria-label={pin.name}
-              onClick={(e) => {
-                e.stopPropagation();
-                if (openPinId === pin.id) {
-                  setOpenPinId(null);
-                  return;
+              style={{ cursor: "pointer", outline: "none" }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  (document.querySelector(
+                    `[data-pin="${pin.id}"]`,
+                  ) as SVGCircleElement | null)?.dispatchEvent(
+                    new MouseEvent("click", { bubbles: true }),
+                  );
                 }
-                if (prefersReducedMotion) {
-                  const target = flyToTarget(pin);
-                  setRotation(target.rotation);
-                  setScale(target.scale);
-                  setMode("user");
-                  setOpenPinId(pin.id);
-                  return;
-                }
-                // Close any existing popover before flying.
-                setOpenPinId(null);
-                startFlyTo(pin, () => setOpenPinId(pin.id));
               }}
-            />
+            >
+              <circle
+                data-pin={pin.id}
+                cx={x}
+                cy={y}
+                r={6}
+                fill="var(--accent)"
+                stroke="var(--bg)"
+                strokeWidth={2}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (openPinId === pin.id) {
+                    setOpenPinId(null);
+                    return;
+                  }
+                  if (prefersReducedMotion) {
+                    const target = flyToTarget(pin);
+                    setRotation(target.rotation);
+                    setScale(target.scale);
+                    setMode("user");
+                    setOpenPinId(pin.id);
+                    return;
+                  }
+                  // Close any existing popover before flying.
+                  setOpenPinId(null);
+                  startFlyTo(pin, () => setOpenPinId(pin.id));
+                }}
+              />
+            </g>
           ))}
         </g>
       </svg>
