@@ -1,21 +1,14 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
-import type { ExtendedFeatureCollection } from "d3-geo";
-import { feature } from "topojson-client";
+import { useEffect, useRef, useState } from "react";
 import type { GeometryCollection, Topology } from "topojson-specification";
 import type { MapPin } from "@/lib/content";
 import {
-  createGlobeProjection,
-  pathsFromGeojson,
-  isPinVisible,
   shouldShowStateBorders,
   flyToTarget,
   GLOBE_WIDTH,
   GLOBE_HEIGHT,
   GLOBE_BASE_RADIUS,
-  SCALE_MIN,
-  SCALE_MAX,
 } from "@/lib/projection";
 import { GlobePin } from "./GlobePin";
 import { PinPopover } from "./PinPopover";
@@ -28,6 +21,7 @@ import { useGlobeWheel } from "./hooks/useGlobeWheel";
 import { useGlobeHashRoute } from "./hooks/useGlobeHashRoute";
 import { useGlobeKeyboard } from "./hooks/useGlobeKeyboard";
 import { usePointerInteraction } from "./hooks/usePointerInteraction";
+import { useGlobeProjection } from "./hooks/useGlobeProjection";
 
 export type WorldTopology = Topology<{ countries: GeometryCollection }>;
 export type StatesTopology = Topology<{ states: GeometryCollection }>;
@@ -79,62 +73,16 @@ export function MapGlobe({
     cancelDrift,
   });
 
-  // Materialize features from topology once on the client. Shipping the raw
-  // TopoJSON (arc-encoded, shared boundaries) rather than the expanded
-  // FeatureCollection roughly halves the /map RSC payload.
-  const worldFeatures = useMemo(
-    () =>
-      feature(
-        worldTopo,
-        worldTopo.objects.countries,
-      ) as unknown as ExtendedFeatureCollection,
-    [worldTopo],
-  );
-  const stateFeatures = useMemo(
-    () =>
-      feature(
-        statesTopo,
-        statesTopo.objects.states,
-      ) as unknown as ExtendedFeatureCollection,
-    [statesTopo],
-  );
-
-  const { countryPaths, statePaths, projectedPins } = useMemo(() => {
-    const projection = createGlobeProjection({
-      width: GLOBE_WIDTH,
-      height: GLOBE_HEIGHT,
-      scale,
-      rotation,
-    });
-    const isInitial =
-      rotation[0] === initialRotation[0] &&
-      rotation[1] === initialRotation[1] &&
-      scale === initialScale;
-    const countryPaths = isInitial
-      ? initialCountryPaths
-      : pathsFromGeojson(worldFeatures, projection);
-    const statePaths = shouldShowStateBorders(scale)
-      ? pathsFromGeojson(stateFeatures, projection)
-      : [];
-    const projectedPins = pins
-      .map((pin) => {
-        const xy = projection([pin.lon, pin.lat]);
-        if (!xy) return null;
-        if (!isPinVisible(pin, rotation)) return null;
-        return { pin, x: xy[0], y: xy[1] };
-      })
-      .filter((p): p is { pin: MapPin; x: number; y: number } => p !== null);
-    return { countryPaths, statePaths, projectedPins };
-  }, [
+  const { countryPaths, statePaths, projectedPins } = useGlobeProjection({
+    worldTopo,
+    statesTopo,
+    pins,
     rotation,
     scale,
-    worldFeatures,
-    stateFeatures,
-    pins,
-    initialCountryPaths,
     initialRotation,
     initialScale,
-  ]);
+    initialCountryPaths,
+  });
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {

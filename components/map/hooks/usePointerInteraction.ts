@@ -135,7 +135,7 @@ export function usePointerInteraction(opts: {
       const nextLon = drag.startRotation[0] + dx * degPerPx;
       const nextLat = Math.max(
         -90,
-        Math.min(90, drag.startRotation[1] + -dy * degPerPx),
+        Math.min(90, drag.startRotation[1] - dy * degPerPx),
       );
       scheduleRotation([nextLon, nextLat]);
       drag.samples.push({ x: e.clientX, y: e.clientY, t: e.timeStamp });

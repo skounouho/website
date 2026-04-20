@@ -7,7 +7,7 @@ interface Props {
   pin: MapPin;
   x: number;
   y: number;
-  onActivate: (pin: MapPin, e: MouseEvent | KeyboardEvent) => void;
+  onActivate: (pin: MapPin) => void;
 }
 
 /**
@@ -21,12 +21,12 @@ export function GlobePin({ pin, x, y, onActivate }: Props) {
     if (e.key !== "Enter" && e.key !== " ") return;
     e.preventDefault();
     e.stopPropagation();
-    onActivate(pin, e);
+    onActivate(pin);
   };
 
   const handleClick = (e: MouseEvent<SVGCircleElement>) => {
     e.stopPropagation();
-    onActivate(pin, e);
+    onActivate(pin);
   };
 
   return (
