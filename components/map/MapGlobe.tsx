@@ -55,12 +55,15 @@ export function MapGlobe({
 
   useAutoRotate(mode, setRotation);
 
-  // Latest-value refs consumed by useFlyTo / useGlobeWheel. Both read the
-  // current rotation/scale without needing to rebind on every render.
+  // Latest-value refs consumed by useFlyTo / useGlobeWheel. Synced after
+  // commit so the React Compiler's "no refs during render" rule is honored;
+  // handlers run post-commit, so the one-effect-cycle lag is invisible.
   const rotationRef = useRef(rotation);
-  rotationRef.current = rotation;
   const scaleRef = useRef(scale);
-  scaleRef.current = scale;
+  useEffect(() => {
+    rotationRef.current = rotation;
+    scaleRef.current = scale;
+  });
 
   const { startDrift, cancelDrift } = useDrift(setRotation);
 
