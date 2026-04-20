@@ -80,9 +80,13 @@ interface MapGlobeProps {
 ```ts
 const [rotation, setRotation] = useState<[number, number]>(initialRotation);
 const [scale, setScale] = useState<number>(initialScale);
-const [mode, setMode] = useState<"auto" | "user" | "flying">("auto");
+const [mode, setMode] = useState<"auto" | "user" | "flying">(
+  prefersReducedMotion ? "user" : "auto",
+);
 const [openPinId, setOpenPinId] = useState<string | null>(null);
 ```
+
+`prefersReducedMotion` is read once via `window.matchMedia("(prefers-reduced-motion: reduce)").matches` (inside a `useState` initializer or a one-shot `useLayoutEffect`, so the initial mode is correct on first paint).
 
 Derived every render: `countryPaths`, optionally `statePaths` (only computed when `shouldShowStateBorders(scale)`), projected pin positions + visibility flags. Computation happens in a `useMemo` keyed on `[rotation, scale]`.
 
@@ -94,9 +98,10 @@ Derived every render: `countryPaths`, optionally `statePaths` (only computed whe
 4. If `shouldShowStateBorders(scale)`, re-derive state path strings from cached `stateFeatures`.
 5. For each pin: `projection([lon, lat])` → `[x, y]`; `isPinVisible` → boolean.
 6. Emit SVG:
-   - Sphere outline: `<circle>` at `[width/2, height/2]` with radius `scale * baseRadius`, stroke `var(--fg-muted)`, fill `var(--border)` (same colors the current map uses).
+   - Viewport: fixed viewBox `0 0 960 540` (preserves the current canvas aspect ratio for the container class `h-[calc(100vh-56px)] md:h-screen w-full`). The projection's base radius is `240` (the sphere fits with padding); `scale = 1` corresponds to that radius, and `scale = 4` expands the projected geometry accordingly. `vectorEffect="non-scaling-stroke"` keeps strokes crisp at any zoom.
+   - Sphere outline: `<circle>` at `[480, 270]` with radius `240 * scale`, stroke `var(--fg-muted)`, fill `var(--border)` (same colors the current map uses).
    - Country paths: `<path>` with `stroke="var(--fg-muted)"`, `fill="none"`, `strokeWidth={0.5}`, `vectorEffect="non-scaling-stroke"`.
-   - State paths (conditional, fade in via CSS opacity transition over 150ms): same stroke, slightly lighter weight.
+   - State paths (conditional, fade in via CSS opacity transition over 150ms): `stroke="var(--fg-muted)"`, `strokeWidth={0.4}`, `opacity={0.6}`, `fill="none"`.
    - Visible pins: `<circle r={6} fill="var(--accent)" stroke="var(--bg)" strokeWidth={2}>` at projected coords, with `data-pin={pin.id}`.
 
 Far-side pins are omitted from the DOM entirely (not hidden via CSS). That keeps tab order clean and matches the "hidden entirely" product decision.
@@ -112,7 +117,7 @@ Pointer down on the globe container:
 
 Pointer move while dragging:
 - Compute `dx`, `dy` since drag start.
-- Δλ = `dx * (180 / (scale * baseRadius))`. Δφ = `-dy * (180 / (scale * baseRadius))`.
+- Δλ = `dx * (180 / (scale * 240))`. Δφ = `-dy * (180 / (scale * 240))`. (240 is the sphere's base radius from the rendering pipeline.)
 - New rotation = `[startλ + Δλ, clamp(startφ + Δφ, -90, 90)]`.
 - `setRotation` is called inside a rAF throttle — no more than one update per animation frame, to avoid React re-render storms during fast drags.
 
@@ -129,7 +134,7 @@ Triggered by click on a visible pin (not matching the currently open pin), or by
 
 - Target: `rotation → flyToTarget(pin).rotation`, `scale → flyToTarget(pin).scale`.
 - Easing: `cubic-bezier(0.2, 0, 0, 1)` over 750ms (both constants already live in `MapSwitcher`; preserve in `MapGlobe` as `GLOBE_EASING` / `GLOBE_DURATION_MS`).
-- Implementation: rAF interpolation. Compute `t ∈ [0, 1]` each frame, set `rotation` = slerp-ish linear interpolation on `[λ, φ]` (short-arc: if `|Δλ| > 180`, go the other way). Scale interpolates linearly.
+- Implementation: rAF interpolation. Compute `t ∈ [0, 1]` each frame with the easing applied; set `rotation` via linear interpolation on `[λ, φ]` with short-arc handling (if `|Δλ| > 180`, wrap so the globe rotates the shorter way). Scale interpolates linearly.
 - `mode` is set to `flying` during the animation; pointer and wheel events cancel it (set `mode = "user"`, stop rAF at current state).
 - On completion, open the popover (`setOpenPinId(pin.id)`).
 
@@ -157,7 +162,7 @@ This matches the current `MapCanvas` behavior semantically but without the per-m
 - Visible pins: rendered as focusable buttons (or `<g role="button" tabIndex={0}>` — whichever fits the existing popover wiring best). Hidden (far-side) pins are not in the DOM, so they're automatically out of tab order.
 - Keyboard:
   - Arrow keys while the globe container has focus: rotate in 5° steps (Left/Right → λ, Up/Down → φ).
-  - `+` / `-`: zoom in / out one step (0.2× scale).
+  - `+` (or `=`) / `-`: zoom in / out one step (multiplies/divides scale by 1.2, clamped to `[1, 4]`).
   - Tab cycles visible pins in render order.
   - Enter / Space on a focused pin opens the popover (same as click).
   - Escape closes an open popover.
