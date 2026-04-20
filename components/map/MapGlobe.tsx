@@ -26,16 +26,10 @@ import { useDrift } from "./hooks/useDrift";
 import { useGlobeWheel } from "./hooks/useGlobeWheel";
 import { useGlobeHashRoute } from "./hooks/useGlobeHashRoute";
 import { useGlobeKeyboard } from "./hooks/useGlobeKeyboard";
+import { usePointerInteraction } from "./hooks/usePointerInteraction";
 
 export type WorldTopology = Topology<{ countries: GeometryCollection }>;
 export type StatesTopology = Topology<{ states: GeometryCollection }>;
-
-// Drag inertia sampling. DRIFT_SAMPLE_WINDOW_MS is the span (ms) we look
-// back over to compute release velocity, which damps single-event jitter
-// at pointer-up. DRIFT_MIN_RELEASE_SPEED is the minimum speed threshold
-// (deg/frame) below which we skip launching drift at all.
-const DRIFT_SAMPLE_WINDOW_MS = 80;
-const DRIFT_MIN_RELEASE_SPEED = 0.15;
 
 export interface MapGlobeProps {
   pins: MapPin[];
@@ -162,24 +156,8 @@ export function MapGlobe({
 
   const openPin = projectedPins.find((p) => p.pin.id === openPinId) ?? null;
 
-  const dragRef = useRef<{
-    pointerId: number;
-    startX: number;
-    startY: number;
-    startRotation: [number, number];
-    samples: Array<{ x: number; y: number; t: number }>;
-  } | null>(null);
-  const pinchRef = useRef<{
-    pointers: Map<number, { x: number; y: number }>;
-    startDistance: number | null;
-    startScale: number;
-  }>({ pointers: new Map(), startDistance: null, startScale: 1 });
   const globeCircleRef = useRef<SVGCircleElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
-  // Tracks whether the most recent pointerdown landed on the globe, so that
-  // the synthesized click at pointerup doesn't trigger "resume auto" when
-  // the user was dragging the globe (especially drag-release off-sphere).
-  const pointerDownOnGlobeRef = useRef<boolean>(false);
 
   function isPointerOnGlobe(clientX: number, clientY: number): boolean {
     const el = globeCircleRef.current;
@@ -209,122 +187,37 @@ export function MapGlobe({
     setScale,
   });
 
+  const {
+    onPointerDown,
+    onPointerMove,
+    onPointerUp,
+    onPointerCancel,
+    onClick,
+  } = usePointerInteraction({
+    scale,
+    rotation,
+    prefersReducedMotion,
+    isPointerOnGlobe,
+    setMode,
+    setOpenPinId,
+    cancelFly,
+    cancelDrift,
+    startDrift,
+    scheduleRotation,
+    scheduleScale,
+  });
+
   return (
     <div
       ref={containerRef}
       tabIndex={0}
       className="relative h-[calc(100vh-56px)] md:h-screen w-full overflow-hidden touch-none outline-none focus-visible:ring-1 focus-visible:ring-[var(--fg-muted)] focus-visible:ring-inset"
       onKeyDown={onKeyDown}
-      onPointerDown={(e) => {
-        // Ignore clicks on pins — those open popovers.
-        if ((e.target as HTMLElement).closest("[data-pin]")) return;
-        const onGlobe = isPointerOnGlobe(e.clientX, e.clientY);
-        pointerDownOnGlobeRef.current = onGlobe;
-        if (!onGlobe) return;
-        cancelFly();
-        cancelDrift();
-        (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
-        dragRef.current = {
-          pointerId: e.pointerId,
-          startX: e.clientX,
-          startY: e.clientY,
-          startRotation: rotation,
-          samples: [{ x: e.clientX, y: e.clientY, t: e.timeStamp }],
-        };
-        setMode("user");
-        pinchRef.current.pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
-        if (pinchRef.current.pointers.size === 2) {
-          const [a, b] = Array.from(pinchRef.current.pointers.values());
-          pinchRef.current.startDistance = Math.hypot(a.x - b.x, a.y - b.y);
-          pinchRef.current.startScale = scale;
-          // Cancel any in-flight drag — pinch takes over.
-          dragRef.current = null;
-        }
-      }}
-      onPointerMove={(e) => {
-        const drag = dragRef.current;
-        if (drag && drag.pointerId === e.pointerId) {
-          const dx = e.clientX - drag.startX;
-          const dy = e.clientY - drag.startY;
-          const dLon = dx * (180 / (scale * GLOBE_BASE_RADIUS));
-          const dLat = -dy * (180 / (scale * GLOBE_BASE_RADIUS));
-          const nextLon = drag.startRotation[0] + dLon;
-          const nextLat = Math.max(-90, Math.min(90, drag.startRotation[1] + dLat));
-          scheduleRotation([nextLon, nextLat]);
-          // Track pointer samples in a rolling window for release-velocity calc.
-          drag.samples.push({ x: e.clientX, y: e.clientY, t: e.timeStamp });
-          while (
-            drag.samples.length > 2 &&
-            e.timeStamp - drag.samples[0].t > DRIFT_SAMPLE_WINDOW_MS
-          ) {
-            drag.samples.shift();
-          }
-        }
-        if (pinchRef.current.pointers.has(e.pointerId)) {
-          pinchRef.current.pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
-        }
-        if (
-          pinchRef.current.pointers.size === 2 &&
-          pinchRef.current.startDistance !== null
-        ) {
-          const [a, b] = Array.from(pinchRef.current.pointers.values());
-          const dist = Math.hypot(a.x - b.x, a.y - b.y);
-          const ratio = dist / pinchRef.current.startDistance;
-          scheduleScale(pinchRef.current.startScale * ratio);
-        }
-      }}
-      onPointerUp={(e) => {
-        const drag = dragRef.current;
-        if (drag && drag.pointerId === e.pointerId) {
-          // Release velocity = (newest - oldest) / Δt across the rolling window,
-          // converted to degrees per ~16ms frame. Pinch suppresses drift (two
-          // fingers rarely mean "throw me").
-          if (drag.samples.length >= 2 && pinchRef.current.pointers.size < 2) {
-            const first = drag.samples[0];
-            const last = drag.samples[drag.samples.length - 1];
-            const dt = last.t - first.t;
-            if (dt > 0 && dt < 150) {
-              const pxPerMsToDegPerFrame =
-                16.67 * (180 / (scale * GLOBE_BASE_RADIUS));
-              const vLon = ((last.x - first.x) / dt) * pxPerMsToDegPerFrame;
-              const vLat = (-(last.y - first.y) / dt) * pxPerMsToDegPerFrame;
-              if (
-                !prefersReducedMotion &&
-                Math.hypot(vLon, vLat) > DRIFT_MIN_RELEASE_SPEED
-              ) {
-                startDrift(vLon, vLat);
-              }
-            }
-          }
-          dragRef.current = null;
-        }
-        pinchRef.current.pointers.delete(e.pointerId);
-        if (pinchRef.current.pointers.size < 2) {
-          pinchRef.current.startDistance = null;
-        }
-      }}
-      onPointerCancel={(e) => {
-        dragRef.current = null;
-        cancelDrift();
-        pinchRef.current.pointers.delete(e.pointerId);
-        if (pinchRef.current.pointers.size < 2) {
-          pinchRef.current.startDistance = null;
-        }
-      }}
-      onClick={(e) => {
-        if ((e.target as HTMLElement).closest("[data-pin]")) return;
-        setOpenPinId(null);
-        // If pointerdown started on the globe, this click terminates a drag
-        // (possibly released off-sphere); don't treat it as "click outside".
-        const startedOnGlobe = pointerDownOnGlobeRef.current;
-        pointerDownOnGlobeRef.current = false;
-        if (startedOnGlobe) return;
-        if (!isPointerOnGlobe(e.clientX, e.clientY)) {
-          cancelFly();
-          cancelDrift();
-          setMode("auto");
-        }
-      }}
+      onPointerDown={onPointerDown}
+      onPointerMove={onPointerMove}
+      onPointerUp={onPointerUp}
+      onPointerCancel={onPointerCancel}
+      onClick={onClick}
     >
       <svg
         viewBox={`0 0 ${GLOBE_WIDTH} ${GLOBE_HEIGHT}`}
