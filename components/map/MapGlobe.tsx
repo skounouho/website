@@ -102,6 +102,35 @@ export function MapGlobe({
     return () => cancelAnimationFrame(rafId);
   }, [mode]);
 
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const route = () => {
+      const hash = window.location.hash.slice(1);
+      if (!hash) return;
+      const pin = pins.find((p) => p.id === hash);
+      if (!pin) return;
+      if (prefersReducedMotion) {
+        const target = flyToTarget(pin);
+        setRotation(target.rotation);
+        setScale(target.scale);
+        setMode("user");
+        setOpenPinId(pin.id);
+      } else {
+        setOpenPinId(null);
+        startFlyTo(pin, () => setOpenPinId(pin.id));
+      }
+    };
+
+    route();
+    window.addEventListener("hashchange", route);
+    return () => window.removeEventListener("hashchange", route);
+    // `startFlyTo` reads current rotation/scale via the closure each call,
+    // which is what we want — it should tween from wherever the globe is
+    // when the hash fires.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pins, prefersReducedMotion]);
+
   const openPin = projectedPins.find((p) => p.pin.id === openPinId) ?? null;
 
   const dragRef = useRef<{
