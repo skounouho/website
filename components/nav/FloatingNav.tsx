@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
 import { BookOpen, FileText, Home, Map } from "lucide-react";
 import type { ComponentType, SVGProps } from "react";
 import { NavIcon } from "./NavIcon";
@@ -14,19 +15,48 @@ interface NavItem {
 }
 
 const items: NavItem[] = [
-  { href: "/", label: "Home", Icon: Home },
-  { href: "/resume", label: "Resume", Icon: FileText },
+  { href: "/#about", label: "Home", Icon: Home },
+  { href: "/#resume", label: "Resume", Icon: FileText },
   { href: "/blog", label: "Blog", Icon: BookOpen },
   { href: "/map", label: "Map", Icon: Map },
 ];
 
-function isActive(pathname: string, href: string): boolean {
+const RESUME_HASHES = new Set([
+  "#resume",
+  "#work",
+  "#teaching",
+  "#education",
+  "#papers",
+  "#conferences",
+]);
+
+function isActive(pathname: string, hash: string, href: string): boolean {
+  // Home-page anchor links
+  if (href === "/#about") {
+    return pathname === "/" && (hash === "" || hash === "#about");
+  }
+  if (href === "/#resume") {
+    return pathname === "/" && RESUME_HASHES.has(hash);
+  }
+  // Non-home routes
   if (href === "/") return pathname === "/";
   return pathname === href || pathname.startsWith(href + "/");
 }
 
+function useHash(): string {
+  const [hash, setHash] = useState("");
+  useEffect(() => {
+    const sync = () => setHash(window.location.hash);
+    sync();
+    window.addEventListener("hashchange", sync);
+    return () => window.removeEventListener("hashchange", sync);
+  }, []);
+  return hash;
+}
+
 export function FloatingNav() {
   const pathname = usePathname();
+  const hash = useHash();
   return (
     <>
       {/* Desktop: left edge, vertical */}
@@ -36,7 +66,7 @@ export function FloatingNav() {
       >
         <ul className="flex flex-col gap-8">
           {items.map(({ href, label, Icon }) => {
-            const active = isActive(pathname, href);
+            const active = isActive(pathname, hash, href);
             return (
               <li key={href}>
                 <Link
@@ -80,7 +110,7 @@ export function FloatingNav() {
         }}
       >
         {items.map(({ href, label, Icon }) => {
-          const active = isActive(pathname, href);
+          const active = isActive(pathname, hash, href);
           return (
             <Link
               key={href}
