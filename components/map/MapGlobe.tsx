@@ -17,6 +17,7 @@ import {
   SCALE_MIN,
   SCALE_MAX,
 } from "@/lib/projection";
+import { GlobePin } from "./GlobePin";
 import { PinPopover } from "./PinPopover";
 import { usePrefersReducedMotion } from "./hooks/usePrefersReducedMotion";
 import { useRafBatch } from "./hooks/useRafBatch";
@@ -207,6 +208,24 @@ export function MapGlobe({
     scheduleScale,
   });
 
+  const onPinActivate = (pin: MapPin) => {
+    if (openPinId === pin.id) {
+      setOpenPinId(null);
+      return;
+    }
+    if (prefersReducedMotion) {
+      cancelDrift();
+      const target = flyToTarget(pin);
+      setRotation(target.rotation);
+      setScale(target.scale);
+      setMode("user");
+      setOpenPinId(pin.id);
+      return;
+    }
+    setOpenPinId(null); // close existing popover before flying
+    startFlyTo(pin, () => setOpenPinId(pin.id));
+  };
+
   return (
     <div
       ref={containerRef}
@@ -262,65 +281,13 @@ export function MapGlobe({
         </g>
         <g>
           {projectedPins.map(({ pin, x, y }) => (
-            <g
+            <GlobePin
               key={pin.id}
-              tabIndex={0}
-              role="button"
-              aria-label={pin.name}
-              className="group outline-none"
-              style={{ cursor: "pointer" }}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" || e.key === " ") {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  (document.querySelector(
-                    `[data-pin="${pin.id}"]`,
-                  ) as SVGCircleElement | null)?.dispatchEvent(
-                    new MouseEvent("click", { bubbles: true }),
-                  );
-                }
-              }}
-            >
-              <circle
-                cx={x}
-                cy={y}
-                r={8}
-                fill="none"
-                stroke="var(--fg-muted)"
-                strokeWidth={1.5}
-                vectorEffect="non-scaling-stroke"
-                className="opacity-0 group-focus-visible:opacity-100 transition-opacity duration-[var(--duration-fast)]"
-                aria-hidden="true"
-              />
-              <circle
-                data-pin={pin.id}
-                cx={x}
-                cy={y}
-                r={4.8}
-                fill="var(--accent)"
-                stroke="var(--bg)"
-                strokeWidth={1.6}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  if (openPinId === pin.id) {
-                    setOpenPinId(null);
-                    return;
-                  }
-                  if (prefersReducedMotion) {
-                    cancelDrift();
-                    const target = flyToTarget(pin);
-                    setRotation(target.rotation);
-                    setScale(target.scale);
-                    setMode("user");
-                    setOpenPinId(pin.id);
-                    return;
-                  }
-                  // Close any existing popover before flying.
-                  setOpenPinId(null);
-                  startFlyTo(pin, () => setOpenPinId(pin.id));
-                }}
-              />
-            </g>
+              pin={pin}
+              x={x}
+              y={y}
+              onActivate={onPinActivate}
+            />
           ))}
         </g>
       </svg>
