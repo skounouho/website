@@ -21,6 +21,7 @@ import { cubicBezierEase, lerpRotation, lerpScale } from "@/lib/tween";
 import { PinPopover } from "./PinPopover";
 import { usePrefersReducedMotion } from "./hooks/usePrefersReducedMotion";
 import { useRafBatch } from "./hooks/useRafBatch";
+import { useAutoRotate, type GlobeMode } from "./hooks/useAutoRotate";
 
 export type WorldTopology = Topology<{ countries: GeometryCollection }>;
 export type StatesTopology = Topology<{ states: GeometryCollection }>;
@@ -58,12 +59,14 @@ export function MapGlobe({
   const prefersReducedMotion = usePrefersReducedMotion();
   const [rotation, setRotation] = useState<[number, number]>(initialRotation);
   const [scale, setScale] = useState<number>(initialScale);
-  const [mode, setMode] = useState<"auto" | "user" | "flying">(
+  const [mode, setMode] = useState<GlobeMode>(
     prefersReducedMotion ? "user" : "auto",
   );
   const [openPinId, setOpenPinId] = useState<string | null>(null);
 
   const { scheduleRotation, scheduleScale } = useRafBatch(setRotation, setScale);
+
+  useAutoRotate(mode, setRotation);
 
   // Materialize features from topology once on the client. Shipping the raw
   // TopoJSON (arc-encoded, shared boundaries) rather than the expanded
@@ -129,17 +132,6 @@ export function MapGlobe({
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, []);
-
-  useEffect(() => {
-    if (mode !== "auto") return;
-    let rafId = 0;
-    const tick = () => {
-      setRotation(([lon, lat]) => [(lon + 0.05) % 360, lat]);
-      rafId = requestAnimationFrame(tick);
-    };
-    rafId = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(rafId);
-  }, [mode]);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
