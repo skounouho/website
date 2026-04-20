@@ -11,6 +11,8 @@ import {
   GLOBE_WIDTH,
   GLOBE_HEIGHT,
   GLOBE_BASE_RADIUS,
+  SCALE_MIN,
+  SCALE_MAX,
 } from "@/lib/projection";
 import { PinPopover } from "./PinPopover";
 
@@ -33,7 +35,7 @@ export function MapGlobe({
 }: MapGlobeProps) {
   const prefersReducedMotion = usePrefersReducedMotion();
   const [rotation, setRotation] = useState<[number, number]>(initialRotation);
-  const [scale] = useState<number>(initialScale);
+  const [scale, setScale] = useState<number>(initialScale);
   const [mode, setMode] = useState<"auto" | "user" | "flying">(
     prefersReducedMotion ? "user" : "auto",
   );
@@ -104,18 +106,36 @@ export function MapGlobe({
     startRotation: [number, number];
   } | null>(null);
   const pendingRotationRef = useRef<[number, number] | null>(null);
+  const pendingScaleRef = useRef<number | null>(null);
   const rafRef = useRef<number | null>(null);
+  const pinchRef = useRef<{
+    pointers: Map<number, { x: number; y: number }>;
+    startDistance: number | null;
+    startScale: number;
+  }>({ pointers: new Map(), startDistance: null, startScale: 1 });
 
   function flushPendingRotation() {
     if (pendingRotationRef.current) {
       setRotation(pendingRotationRef.current);
       pendingRotationRef.current = null;
     }
+    if (pendingScaleRef.current !== null) {
+      setScale(pendingScaleRef.current);
+      pendingScaleRef.current = null;
+    }
     rafRef.current = null;
   }
 
   function scheduleRotation(next: [number, number]) {
     pendingRotationRef.current = next;
+    if (rafRef.current === null) {
+      rafRef.current = requestAnimationFrame(flushPendingRotation);
+    }
+  }
+
+  function scheduleScale(next: number) {
+    const clamped = Math.max(SCALE_MIN, Math.min(SCALE_MAX, next));
+    pendingScaleRef.current = clamped;
     if (rafRef.current === null) {
       rafRef.current = requestAnimationFrame(flushPendingRotation);
     }
@@ -142,25 +162,59 @@ export function MapGlobe({
           startRotation: rotation,
         };
         setMode("user");
+        pinchRef.current.pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+        if (pinchRef.current.pointers.size === 2) {
+          const [a, b] = Array.from(pinchRef.current.pointers.values());
+          pinchRef.current.startDistance = Math.hypot(a.x - b.x, a.y - b.y);
+          pinchRef.current.startScale = scale;
+          // Cancel any in-flight drag — pinch takes over.
+          dragRef.current = null;
+        }
       }}
       onPointerMove={(e) => {
         const drag = dragRef.current;
-        if (!drag || drag.pointerId !== e.pointerId) return;
-        const dx = e.clientX - drag.startX;
-        const dy = e.clientY - drag.startY;
-        const dLon = dx * (180 / (scale * GLOBE_BASE_RADIUS));
-        const dLat = -dy * (180 / (scale * GLOBE_BASE_RADIUS));
-        const nextLon = drag.startRotation[0] + dLon;
-        const nextLat = Math.max(-90, Math.min(90, drag.startRotation[1] + dLat));
-        scheduleRotation([nextLon, nextLat]);
+        if (drag && drag.pointerId === e.pointerId) {
+          const dx = e.clientX - drag.startX;
+          const dy = e.clientY - drag.startY;
+          const dLon = dx * (180 / (scale * GLOBE_BASE_RADIUS));
+          const dLat = -dy * (180 / (scale * GLOBE_BASE_RADIUS));
+          const nextLon = drag.startRotation[0] + dLon;
+          const nextLat = Math.max(-90, Math.min(90, drag.startRotation[1] + dLat));
+          scheduleRotation([nextLon, nextLat]);
+        }
+        if (pinchRef.current.pointers.has(e.pointerId)) {
+          pinchRef.current.pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+        }
+        if (
+          pinchRef.current.pointers.size === 2 &&
+          pinchRef.current.startDistance !== null
+        ) {
+          const [a, b] = Array.from(pinchRef.current.pointers.values());
+          const dist = Math.hypot(a.x - b.x, a.y - b.y);
+          const ratio = dist / pinchRef.current.startDistance;
+          scheduleScale(pinchRef.current.startScale * ratio);
+        }
       }}
       onPointerUp={(e) => {
         const drag = dragRef.current;
-        if (!drag || drag.pointerId !== e.pointerId) return;
-        dragRef.current = null;
+        if (drag && drag.pointerId === e.pointerId) dragRef.current = null;
+        pinchRef.current.pointers.delete(e.pointerId);
+        if (pinchRef.current.pointers.size < 2) {
+          pinchRef.current.startDistance = null;
+        }
       }}
-      onPointerCancel={() => {
+      onPointerCancel={(e) => {
         dragRef.current = null;
+        pinchRef.current.pointers.delete(e.pointerId);
+        if (pinchRef.current.pointers.size < 2) {
+          pinchRef.current.startDistance = null;
+        }
+      }}
+      onWheel={(e) => {
+        e.preventDefault();
+        setMode("user");
+        const factor = Math.exp(-e.deltaY * 0.001);
+        scheduleScale(scale * factor);
       }}
       onClick={(e) => {
         if ((e.target as HTMLElement).closest("[data-pin]")) return;
