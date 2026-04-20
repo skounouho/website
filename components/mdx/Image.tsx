@@ -26,7 +26,7 @@ export function MdxImage(props: Props) {
         width={w}
         height={h}
         className="h-auto w-full"
-        sizes="(max-width: 768px) 100vw, 65ch"
+        sizes="(max-width: 768px) 100vw, 60ch"
       />
       <figcaption
         className="font-serif mt-3 text-sm italic"

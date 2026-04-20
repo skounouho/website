@@ -1,9 +1,11 @@
 ---
 date: 2026-04-19
-status: draft
+status: implemented
 ---
 
 # Unified Content Width & Spacing
+
+> **Update (implementation):** The final reading width is **60ch**, not 65ch. On first implementation the 65ch container was visibly too narrow because the `md:px-24` gutter was applied *inside* the max-width box, compressing the text column to ~47ch. The fix was (a) drop the target to 60ch (the previous About width) and (b) restructure `PageContainer` into outer (padding + vertical offset) and inner (`max-w-[60ch] mx-auto`) wrappers so the 60ch is the visible text-column width. The rest of this document still reads "65ch" — treat every 65ch reference as 60ch. The structural decision (outer/inner split) is also not reflected in the sections below.
 
 ## Context
 
