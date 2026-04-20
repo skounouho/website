@@ -42,16 +42,12 @@ export default function Home() {
 
   return (
     <PageContainer>
-      <section id="about" aria-labelledby="about-heading">
-        <h1 id="about-heading" className="sr-only">
-          About
-        </h1>
+      <section id="about">
         <article className="prose-site w-full">{renderMdx(about.body)}</article>
       </section>
 
       <hr
-        className="mt-[var(--space-section)] border-0"
-        style={{ borderTop: "1px solid var(--border)" }}
+        className="mt-[var(--space-section)] border-0 border-t"
         aria-hidden="true"
       />
 
