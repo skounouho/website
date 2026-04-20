@@ -25,6 +25,7 @@ import { useFlyTo } from "./hooks/useFlyTo";
 import { useDrift } from "./hooks/useDrift";
 import { useGlobeWheel } from "./hooks/useGlobeWheel";
 import { useGlobeHashRoute } from "./hooks/useGlobeHashRoute";
+import { useGlobeKeyboard } from "./hooks/useGlobeKeyboard";
 
 export type WorldTopology = Topology<{ countries: GeometryCollection }>;
 export type StatesTopology = Topology<{ states: GeometryCollection }>;
@@ -200,59 +201,20 @@ export function MapGlobe({
     scheduleScale,
   });
 
+  const onKeyDown = useGlobeKeyboard({
+    cancelFly,
+    cancelDrift,
+    setMode,
+    setRotation,
+    setScale,
+  });
+
   return (
     <div
       ref={containerRef}
       tabIndex={0}
       className="relative h-[calc(100vh-56px)] md:h-screen w-full overflow-hidden touch-none outline-none focus-visible:ring-1 focus-visible:ring-[var(--fg-muted)] focus-visible:ring-inset"
-      onKeyDown={(e) => {
-        if (e.metaKey || e.ctrlKey) return;
-        const STEP = 5;           // degrees per arrow key
-        const ZOOM_FACTOR = 1.2;  // multiplicative per +/-
-        if (e.key === "ArrowLeft") {
-          e.preventDefault();
-          cancelFly();
-          cancelDrift();
-          setMode("user");
-          setRotation(([lon, lat]) => [lon - STEP, lat]);
-        } else if (e.key === "ArrowRight") {
-          e.preventDefault();
-          cancelFly();
-          cancelDrift();
-          setMode("user");
-          setRotation(([lon, lat]) => [lon + STEP, lat]);
-        } else if (e.key === "ArrowUp") {
-          e.preventDefault();
-          cancelFly();
-          cancelDrift();
-          setMode("user");
-          setRotation(([lon, lat]) => [
-            lon,
-            Math.max(-90, Math.min(90, lat + STEP)),
-          ]);
-        } else if (e.key === "ArrowDown") {
-          e.preventDefault();
-          cancelFly();
-          cancelDrift();
-          setMode("user");
-          setRotation(([lon, lat]) => [
-            lon,
-            Math.max(-90, Math.min(90, lat - STEP)),
-          ]);
-        } else if (e.key === "+" || e.key === "=") {
-          e.preventDefault();
-          cancelFly();
-          cancelDrift();
-          setMode("user");
-          setScale((s) => Math.max(SCALE_MIN, Math.min(SCALE_MAX, s * ZOOM_FACTOR)));
-        } else if (e.key === "-") {
-          e.preventDefault();
-          cancelFly();
-          cancelDrift();
-          setMode("user");
-          setScale((s) => Math.max(SCALE_MIN, Math.min(SCALE_MAX, s / ZOOM_FACTOR)));
-        }
-      }}
+      onKeyDown={onKeyDown}
       onPointerDown={(e) => {
         // Ignore clicks on pins — those open popovers.
         if ((e.target as HTMLElement).closest("[data-pin]")) return;
