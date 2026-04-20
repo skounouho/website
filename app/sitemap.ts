@@ -7,7 +7,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const staticEntries: MetadataRoute.Sitemap = [
     { url: `${SITE_URL}/`, lastModified: new Date() },
     { url: `${SITE_URL}/blog`, lastModified: new Date() },
-    { url: `${SITE_URL}/resume`, lastModified: new Date() },
     { url: `${SITE_URL}/map`, lastModified: new Date() },
   ];
   const postEntries: MetadataRoute.Sitemap = posts.map((p) => ({
