@@ -17,17 +17,14 @@ import {
   SCALE_MIN,
   SCALE_MAX,
 } from "@/lib/projection";
-import { cubicBezierEase, lerpRotation, lerpScale } from "@/lib/tween";
 import { PinPopover } from "./PinPopover";
 import { usePrefersReducedMotion } from "./hooks/usePrefersReducedMotion";
 import { useRafBatch } from "./hooks/useRafBatch";
 import { useAutoRotate, type GlobeMode } from "./hooks/useAutoRotate";
+import { useFlyTo } from "./hooks/useFlyTo";
 
 export type WorldTopology = Topology<{ countries: GeometryCollection }>;
 export type StatesTopology = Topology<{ states: GeometryCollection }>;
-
-const GLOBE_DURATION_MS = 750;
-const GLOBE_EASE = cubicBezierEase(0.2, 0, 0, 1);
 
 // Drag inertia. DRIFT_DECAY is the per-frame velocity multiplier —
 // 0.95 lands on ~50% after 14 frames (~230ms) and decays to the stop
@@ -67,6 +64,21 @@ export function MapGlobe({
   const { scheduleRotation, scheduleScale } = useRafBatch(setRotation, setScale);
 
   useAutoRotate(mode, setRotation);
+
+  // Latest-value refs consumed by useFlyTo / useGlobeWheel. Both read the
+  // current rotation/scale without needing to rebind on every render.
+  const rotationRef = useRef(rotation);
+  rotationRef.current = rotation;
+  const scaleRef = useRef(scale);
+  scaleRef.current = scale;
+
+  const { startFlyTo, cancelFly } = useFlyTo({
+    rotationRef,
+    scaleRef,
+    setRotation,
+    setScale,
+    setMode,
+  });
 
   // Materialize features from topology once on the client. Shipping the raw
   // TopoJSON (arc-encoded, shared boundaries) rather than the expanded
@@ -177,16 +189,9 @@ export function MapGlobe({
     startDistance: number | null;
     startScale: number;
   }>({ pointers: new Map(), startDistance: null, startScale: 1 });
-  const flyRafRef = useRef<number | null>(null);
   const driftRafRef = useRef<number | null>(null);
   const globeCircleRef = useRef<SVGCircleElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
-  // React's JSX onWheel is attached as a passive listener, so preventDefault()
-  // is silently ignored. We bind imperatively below with { passive: false };
-  // scaleRef lets the mount-once handler read the latest committed scale
-  // without rebinding on every zoom.
-  const scaleRef = useRef(scale);
-  scaleRef.current = scale;
   // Tracks whether the most recent pointerdown landed on the globe, so that
   // the synthesized click at pointerup doesn't trigger "resume auto" when
   // the user was dragging the globe (especially drag-release off-sphere).
@@ -200,13 +205,6 @@ export function MapGlobe({
     const cy = rect.top + rect.height / 2;
     const r = rect.width / 2;
     return Math.hypot(clientX - cx, clientY - cy) <= r;
-  }
-
-  function cancelFly() {
-    if (flyRafRef.current !== null) {
-      cancelAnimationFrame(flyRafRef.current);
-      flyRafRef.current = null;
-    }
   }
 
   function cancelDrift() {
@@ -236,37 +234,8 @@ export function MapGlobe({
     driftRafRef.current = requestAnimationFrame(tick);
   }
 
-  function startFlyTo(pin: MapPin, onComplete?: () => void) {
-    cancelFly();
-    cancelDrift();
-    const target = flyToTarget(pin);
-    const startRotation = rotation;
-    const startScale = scale;
-    const startTime = performance.now();
-
-    const step = (now: number) => {
-      const raw = Math.min(1, (now - startTime) / GLOBE_DURATION_MS);
-      const eased = GLOBE_EASE(raw);
-      const r = lerpRotation(startRotation, target.rotation, eased);
-      const s = lerpScale(startScale, target.scale, eased);
-      setRotation(r);
-      setScale(s);
-      if (raw < 1) {
-        flyRafRef.current = requestAnimationFrame(step);
-      } else {
-        flyRafRef.current = null;
-        setMode("user");
-        onComplete?.();
-      }
-    };
-
-    setMode("flying");
-    flyRafRef.current = requestAnimationFrame(step);
-  }
-
   useEffect(() => {
     return () => {
-      if (flyRafRef.current !== null) cancelAnimationFrame(flyRafRef.current);
       if (driftRafRef.current !== null) cancelAnimationFrame(driftRafRef.current);
     };
   }, []);
