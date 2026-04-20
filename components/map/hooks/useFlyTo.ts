@@ -19,8 +19,9 @@ export function useFlyTo(opts: {
   setRotation: Dispatch<SetStateAction<[number, number]>>;
   setScale: Dispatch<SetStateAction<number>>;
   setMode: Dispatch<SetStateAction<GlobeMode>>;
+  cancelDrift: () => void;
 }): FlyTo {
-  const { rotationRef, scaleRef, setRotation, setScale, setMode } = opts;
+  const { rotationRef, scaleRef, setRotation, setScale, setMode, cancelDrift } = opts;
   const flyRafRef = useRef<number | null>(null);
 
   const cancelFly = () => {
@@ -32,6 +33,7 @@ export function useFlyTo(opts: {
 
   const startFlyTo = (pin: MapPin, onComplete?: () => void) => {
     cancelFly();
+    cancelDrift();
     const target = flyToTarget(pin);
     const startRotation = rotationRef.current!;
     const startScale = scaleRef.current!;

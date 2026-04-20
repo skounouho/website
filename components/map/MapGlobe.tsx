@@ -78,6 +78,7 @@ export function MapGlobe({
     setRotation,
     setScale,
     setMode,
+    cancelDrift,
   });
 
   // Materialize features from topology once on the client. Shipping the raw
