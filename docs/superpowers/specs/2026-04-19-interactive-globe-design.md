@@ -26,7 +26,7 @@ The implementation stays in SVG using `d3-geo`'s orthographic projection, rather
 
 - No realistic Earth texture, atmosphere glow, shading, or day/night cycle.
 - No labels (country or state names). Pins and visual recognition carry identity; popovers name the location.
-- No drag inertia. Motion stops when the pointer lifts.
+- No drag-inertia physics simulation. A simple decaying-velocity drift on pointer release is acceptable (added post-initial-spec).
 - No separate mobile layout. Touch is the pointer-equivalent of mouse; flagged below for review.
 - No WebGL/three.js. Rejected in favor of SVG for bundle size, SSR parity, and aesthetic fit.
 - No `react-globe.gl` or other opinionated wrappers. Theming them to match the site fights their defaults.
@@ -121,7 +121,7 @@ Pointer move while dragging:
 - New rotation = `[startλ + Δλ, clamp(startφ + Δφ, -90, 90)]`.
 - `setRotation` is called inside a rAF throttle — no more than one update per animation frame, to avoid React re-render storms during fast drags.
 
-Pointer up: release capture. No inertia.
+Pointer up: release capture. If the pointer was moving at release, apply drag inertia — continue rotating with the release velocity, decaying exponentially (multiplier ~0.95 per frame) until below a small threshold. Release velocity is computed from the rolling ~80ms sample window of pointer positions. Any subsequent pointer/wheel/keyboard interaction cancels the drift. Disabled under `prefers-reduced-motion`.
 
 ### Wheel / pinch to zoom
 

@@ -21,6 +21,16 @@ import { PinPopover } from "./PinPopover";
 const GLOBE_DURATION_MS = 750;
 const GLOBE_EASE = cubicBezierEase(0.2, 0, 0, 1);
 
+// Drag inertia. DRIFT_DECAY is the per-frame velocity multiplier —
+// 0.95 lands on ~50% after 14 frames (~230ms) and decays to the stop
+// threshold in roughly half a second. DRIFT_STOP is deg/frame.
+// DRIFT_SAMPLE_WINDOW is the span (ms) we look back over to compute
+// release velocity, which damps single-event jitter at pointer-up.
+const DRIFT_DECAY = 0.95;
+const DRIFT_STOP = 0.02;
+const DRIFT_SAMPLE_WINDOW_MS = 80;
+const DRIFT_MIN_RELEASE_SPEED = 0.15;
+
 export interface MapGlobeProps {
   pins: MapPin[];
   worldFeatures: ExtendedFeatureCollection;
@@ -111,6 +121,7 @@ export function MapGlobe({
       const pin = pins.find((p) => p.id === hash);
       if (!pin) return;
       if (prefersReducedMotion) {
+        cancelDrift();
         const target = flyToTarget(pin);
         setRotation(target.rotation);
         setScale(target.scale);
@@ -138,6 +149,7 @@ export function MapGlobe({
     startX: number;
     startY: number;
     startRotation: [number, number];
+    samples: Array<{ x: number; y: number; t: number }>;
   } | null>(null);
   const pendingRotationRef = useRef<[number, number] | null>(null);
   const pendingScaleRef = useRef<number | null>(null);
@@ -148,6 +160,7 @@ export function MapGlobe({
     startScale: number;
   }>({ pointers: new Map(), startDistance: null, startScale: 1 });
   const flyRafRef = useRef<number | null>(null);
+  const driftRafRef = useRef<number | null>(null);
 
   function cancelFly() {
     if (flyRafRef.current !== null) {
@@ -156,8 +169,36 @@ export function MapGlobe({
     }
   }
 
+  function cancelDrift() {
+    if (driftRafRef.current !== null) {
+      cancelAnimationFrame(driftRafRef.current);
+      driftRafRef.current = null;
+    }
+  }
+
+  function startDrift(initialVLon: number, initialVLat: number) {
+    cancelDrift();
+    let vLon = initialVLon;
+    let vLat = initialVLat;
+    const tick = () => {
+      vLon *= DRIFT_DECAY;
+      vLat *= DRIFT_DECAY;
+      if (Math.abs(vLon) < DRIFT_STOP && Math.abs(vLat) < DRIFT_STOP) {
+        driftRafRef.current = null;
+        return;
+      }
+      setRotation(([lon, lat]) => [
+        lon + vLon,
+        Math.max(-90, Math.min(90, lat + vLat)),
+      ]);
+      driftRafRef.current = requestAnimationFrame(tick);
+    };
+    driftRafRef.current = requestAnimationFrame(tick);
+  }
+
   function startFlyTo(pin: MapPin, onComplete?: () => void) {
     cancelFly();
+    cancelDrift();
     const target = flyToTarget(pin);
     const startRotation = rotation;
     const startScale = scale;
@@ -214,6 +255,7 @@ export function MapGlobe({
     return () => {
       if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
       if (flyRafRef.current !== null) cancelAnimationFrame(flyRafRef.current);
+      if (driftRafRef.current !== null) cancelAnimationFrame(driftRafRef.current);
     };
   }, []);
 
@@ -229,16 +271,19 @@ export function MapGlobe({
         if (e.key === "ArrowLeft") {
           e.preventDefault();
           cancelFly();
+          cancelDrift();
           setMode("user");
           setRotation(([lon, lat]) => [lon - STEP, lat]);
         } else if (e.key === "ArrowRight") {
           e.preventDefault();
           cancelFly();
+          cancelDrift();
           setMode("user");
           setRotation(([lon, lat]) => [lon + STEP, lat]);
         } else if (e.key === "ArrowUp") {
           e.preventDefault();
           cancelFly();
+          cancelDrift();
           setMode("user");
           setRotation(([lon, lat]) => [
             lon,
@@ -247,6 +292,7 @@ export function MapGlobe({
         } else if (e.key === "ArrowDown") {
           e.preventDefault();
           cancelFly();
+          cancelDrift();
           setMode("user");
           setRotation(([lon, lat]) => [
             lon,
@@ -255,11 +301,13 @@ export function MapGlobe({
         } else if (e.key === "+" || e.key === "=") {
           e.preventDefault();
           cancelFly();
+          cancelDrift();
           setMode("user");
           setScale((s) => Math.max(SCALE_MIN, Math.min(SCALE_MAX, s * ZOOM_FACTOR)));
         } else if (e.key === "-") {
           e.preventDefault();
           cancelFly();
+          cancelDrift();
           setMode("user");
           setScale((s) => Math.max(SCALE_MIN, Math.min(SCALE_MAX, s / ZOOM_FACTOR)));
         }
@@ -268,12 +316,14 @@ export function MapGlobe({
         // Ignore clicks on pins — those open popovers.
         if ((e.target as HTMLElement).closest("[data-pin]")) return;
         cancelFly();
+        cancelDrift();
         (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
         dragRef.current = {
           pointerId: e.pointerId,
           startX: e.clientX,
           startY: e.clientY,
           startRotation: rotation,
+          samples: [{ x: e.clientX, y: e.clientY, t: e.timeStamp }],
         };
         setMode("user");
         pinchRef.current.pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
@@ -295,6 +345,14 @@ export function MapGlobe({
           const nextLon = drag.startRotation[0] + dLon;
           const nextLat = Math.max(-90, Math.min(90, drag.startRotation[1] + dLat));
           scheduleRotation([nextLon, nextLat]);
+          // Track pointer samples in a rolling window for release-velocity calc.
+          drag.samples.push({ x: e.clientX, y: e.clientY, t: e.timeStamp });
+          while (
+            drag.samples.length > 2 &&
+            e.timeStamp - drag.samples[0].t > DRIFT_SAMPLE_WINDOW_MS
+          ) {
+            drag.samples.shift();
+          }
         }
         if (pinchRef.current.pointers.has(e.pointerId)) {
           pinchRef.current.pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
@@ -311,7 +369,29 @@ export function MapGlobe({
       }}
       onPointerUp={(e) => {
         const drag = dragRef.current;
-        if (drag && drag.pointerId === e.pointerId) dragRef.current = null;
+        if (drag && drag.pointerId === e.pointerId) {
+          // Release velocity = (newest - oldest) / Δt across the rolling window,
+          // converted to degrees per ~16ms frame. Pinch suppresses drift (two
+          // fingers rarely mean "throw me").
+          if (drag.samples.length >= 2 && pinchRef.current.pointers.size < 2) {
+            const first = drag.samples[0];
+            const last = drag.samples[drag.samples.length - 1];
+            const dt = last.t - first.t;
+            if (dt > 0 && dt < 150) {
+              const pxPerMsToDegPerFrame =
+                16.67 * (180 / (scale * GLOBE_BASE_RADIUS));
+              const vLon = ((last.x - first.x) / dt) * pxPerMsToDegPerFrame;
+              const vLat = (-(last.y - first.y) / dt) * pxPerMsToDegPerFrame;
+              if (
+                !prefersReducedMotion &&
+                Math.hypot(vLon, vLat) > DRIFT_MIN_RELEASE_SPEED
+              ) {
+                startDrift(vLon, vLat);
+              }
+            }
+          }
+          dragRef.current = null;
+        }
         pinchRef.current.pointers.delete(e.pointerId);
         if (pinchRef.current.pointers.size < 2) {
           pinchRef.current.startDistance = null;
@@ -319,6 +399,7 @@ export function MapGlobe({
       }}
       onPointerCancel={(e) => {
         dragRef.current = null;
+        cancelDrift();
         pinchRef.current.pointers.delete(e.pointerId);
         if (pinchRef.current.pointers.size < 2) {
           pinchRef.current.startDistance = null;
@@ -331,6 +412,7 @@ export function MapGlobe({
       onWheel={(e) => {
         e.preventDefault();
         cancelFly();
+        cancelDrift();
         setMode("user");
         const factor = Math.exp(-e.deltaY * 0.001);
         scheduleScale(scale * factor);
@@ -426,6 +508,7 @@ export function MapGlobe({
                     return;
                   }
                   if (prefersReducedMotion) {
+                    cancelDrift();
                     const target = flyToTarget(pin);
                     setRotation(target.rotation);
                     setScale(target.scale);
