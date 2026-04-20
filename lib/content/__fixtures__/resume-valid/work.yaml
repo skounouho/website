@@ -6,5 +6,6 @@
   end: null
   highlights:
     - Shipped v1 of the trading UI.
+  category: paid
   blog_slugs: []
   map_pin_ids: [nyc]

@@ -57,6 +57,7 @@ describe("workEntrySchema", () => {
     start: "2026-01",
     end: null,
     highlights: ["Did a thing."],
+    category: "paid",
   };
 
   it("accepts null end", () => {
@@ -85,6 +86,30 @@ describe("workEntrySchema", () => {
     expect(() =>
       workEntrySchema.parse({ ...base, id: "Akara Markets" }),
     ).toThrow();
+  });
+
+  it("requires category", () => {
+    const { category: _c, ...rest } = base;
+    void _c;
+    expect(() => workEntrySchema.parse(rest)).toThrow(/category/);
+  });
+
+  it("rejects unknown category values", () => {
+    expect(() =>
+      workEntrySchema.parse({ ...base, category: "volunteer" }),
+    ).toThrow();
+  });
+
+  it("accepts category 'paid'", () => {
+    expect(workEntrySchema.parse({ ...base, category: "paid" }).category).toBe(
+      "paid",
+    );
+  });
+
+  it("accepts category 'teaching-other'", () => {
+    expect(
+      workEntrySchema.parse({ ...base, category: "teaching-other" }).category,
+    ).toBe("teaching-other");
   });
 });
 

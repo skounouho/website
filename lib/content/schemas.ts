@@ -49,6 +49,9 @@ const yearMonthRange = <T extends z.ZodRawShape>(shape: T) =>
       { message: "end must be >= start", path: ["end"] },
     );
 
+export const workCategory = z.enum(["paid", "teaching-other"]);
+export type WorkCategory = z.infer<typeof workCategory>;
+
 export const workEntrySchema = yearMonthRange({
   id: kebabCase,
   org: z.string().min(1),
@@ -59,6 +62,7 @@ export const workEntrySchema = yearMonthRange({
   end: yearMonthOrNull,
   org_url: url.optional(),
   highlights: z.array(z.string().min(1)).min(1),
+  category: workCategory,
   blog_slugs: z.array(kebabCase).default([]),
   map_pin_ids: z.array(kebabCase).default([]),
 });
