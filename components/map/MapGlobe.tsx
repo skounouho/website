@@ -22,17 +22,15 @@ import { usePrefersReducedMotion } from "./hooks/usePrefersReducedMotion";
 import { useRafBatch } from "./hooks/useRafBatch";
 import { useAutoRotate, type GlobeMode } from "./hooks/useAutoRotate";
 import { useFlyTo } from "./hooks/useFlyTo";
+import { useDrift } from "./hooks/useDrift";
 
 export type WorldTopology = Topology<{ countries: GeometryCollection }>;
 export type StatesTopology = Topology<{ states: GeometryCollection }>;
 
-// Drag inertia. DRIFT_DECAY is the per-frame velocity multiplier —
-// 0.95 lands on ~50% after 14 frames (~230ms) and decays to the stop
-// threshold in roughly half a second. DRIFT_STOP is deg/frame.
-// DRIFT_SAMPLE_WINDOW is the span (ms) we look back over to compute
-// release velocity, which damps single-event jitter at pointer-up.
-const DRIFT_DECAY = 0.95;
-const DRIFT_STOP = 0.02;
+// Drag inertia sampling. DRIFT_SAMPLE_WINDOW_MS is the span (ms) we look
+// back over to compute release velocity, which damps single-event jitter
+// at pointer-up. DRIFT_MIN_RELEASE_SPEED is the minimum speed threshold
+// (deg/frame) below which we skip launching drift at all.
 const DRIFT_SAMPLE_WINDOW_MS = 80;
 const DRIFT_MIN_RELEASE_SPEED = 0.15;
 
@@ -71,6 +69,8 @@ export function MapGlobe({
   rotationRef.current = rotation;
   const scaleRef = useRef(scale);
   scaleRef.current = scale;
+
+  const { startDrift, cancelDrift } = useDrift(setRotation);
 
   const { startFlyTo, cancelFly } = useFlyTo({
     rotationRef,
@@ -190,7 +190,6 @@ export function MapGlobe({
     startDistance: number | null;
     startScale: number;
   }>({ pointers: new Map(), startDistance: null, startScale: 1 });
-  const driftRafRef = useRef<number | null>(null);
   const globeCircleRef = useRef<SVGCircleElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
   // Tracks whether the most recent pointerdown landed on the globe, so that
@@ -207,39 +206,6 @@ export function MapGlobe({
     const r = rect.width / 2;
     return Math.hypot(clientX - cx, clientY - cy) <= r;
   }
-
-  function cancelDrift() {
-    if (driftRafRef.current !== null) {
-      cancelAnimationFrame(driftRafRef.current);
-      driftRafRef.current = null;
-    }
-  }
-
-  function startDrift(initialVLon: number, initialVLat: number) {
-    cancelDrift();
-    let vLon = initialVLon;
-    let vLat = initialVLat;
-    const tick = () => {
-      vLon *= DRIFT_DECAY;
-      vLat *= DRIFT_DECAY;
-      if (Math.abs(vLon) < DRIFT_STOP && Math.abs(vLat) < DRIFT_STOP) {
-        driftRafRef.current = null;
-        return;
-      }
-      setRotation(([lon, lat]) => [
-        lon + vLon,
-        Math.max(-90, Math.min(90, lat + vLat)),
-      ]);
-      driftRafRef.current = requestAnimationFrame(tick);
-    };
-    driftRafRef.current = requestAnimationFrame(tick);
-  }
-
-  useEffect(() => {
-    return () => {
-      if (driftRafRef.current !== null) cancelAnimationFrame(driftRafRef.current);
-    };
-  }, []);
 
   // Non-passive wheel listener for zoom — JSX onWheel is passive in React, so
   // preventDefault() there is a no-op. See scaleRef note above for why the
