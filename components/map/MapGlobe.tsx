@@ -31,8 +31,12 @@ export function MapGlobe({
   initialScale,
   initialCountryPaths,
 }: MapGlobeProps) {
-  const [rotation] = useState<[number, number]>(initialRotation);
+  const prefersReducedMotion = usePrefersReducedMotion();
+  const [rotation, setRotation] = useState<[number, number]>(initialRotation);
   const [scale] = useState<number>(initialScale);
+  const [mode, setMode] = useState<"auto" | "user" | "flying">(
+    prefersReducedMotion ? "user" : "auto",
+  );
   const [openPinId, setOpenPinId] = useState<string | null>(null);
 
   const { countryPaths, statePaths, projectedPins } = useMemo(() => {
@@ -79,6 +83,17 @@ export function MapGlobe({
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, []);
+
+  useEffect(() => {
+    if (mode !== "auto") return;
+    let rafId = 0;
+    const tick = () => {
+      setRotation(([lon, lat]) => [(lon + 0.05) % 360, lat]);
+      rafId = requestAnimationFrame(tick);
+    };
+    rafId = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(rafId);
+  }, [mode]);
 
   const openPin = projectedPins.find((p) => p.pin.id === openPinId) ?? null;
 
@@ -161,4 +176,14 @@ export function MapGlobe({
       ) : null}
     </div>
   );
+}
+
+function usePrefersReducedMotion(): boolean {
+  // Read on mount. Not reactive to changes — matches the site's
+  // other motion-gated features (MapSwitcher used the same pattern).
+  const [reduced] = useState<boolean>(() => {
+    if (typeof window === "undefined") return false;
+    return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  });
+  return reduced;
 }
