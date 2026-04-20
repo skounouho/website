@@ -79,6 +79,16 @@ export default function Home() {
               X
             </a>
           </li>
+          <li>
+            <a
+              href="https://github.com/skounouho"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="no-underline transition-colors duration-[var(--duration-fast)] ease-[var(--ease-standard)] hover:text-[color:var(--accent)]"
+            >
+              GitHub
+            </a>
+          </li>
         </ul>
       </section>
 
