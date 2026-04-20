@@ -23,6 +23,7 @@ import { useRafBatch } from "./hooks/useRafBatch";
 import { useAutoRotate, type GlobeMode } from "./hooks/useAutoRotate";
 import { useFlyTo } from "./hooks/useFlyTo";
 import { useDrift } from "./hooks/useDrift";
+import { useGlobeWheel } from "./hooks/useGlobeWheel";
 
 export type WorldTopology = Topology<{ countries: GeometryCollection }>;
 export type StatesTopology = Topology<{ states: GeometryCollection }>;
@@ -207,26 +208,15 @@ export function MapGlobe({
     return Math.hypot(clientX - cx, clientY - cy) <= r;
   }
 
-  // Non-passive wheel listener for zoom — JSX onWheel is passive in React, so
-  // preventDefault() there is a no-op. See scaleRef note above for why the
-  // handler is safe to subscribe once.
-  useEffect(() => {
-    const el = containerRef.current;
-    if (!el) return;
-    const onWheel = (e: WheelEvent) => {
-      if (!isPointerOnGlobe(e.clientX, e.clientY)) return;
-      e.preventDefault();
-      cancelFly();
-      cancelDrift();
-      setMode("user");
-      const factor = Math.exp(-e.deltaY * 0.001);
-      scheduleScale(scaleRef.current * factor);
-    };
-    el.addEventListener("wheel", onWheel, { passive: false });
-    return () => el.removeEventListener("wheel", onWheel);
-    // Handler only reads refs + stable setters, so subscribe once.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  useGlobeWheel({
+    containerRef,
+    scaleRef,
+    isPointerOnGlobe,
+    cancelFly,
+    cancelDrift,
+    setMode,
+    scheduleScale,
+  });
 
   return (
     <div
