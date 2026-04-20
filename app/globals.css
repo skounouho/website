@@ -46,15 +46,17 @@ body {
   border-radius: 2px;
 }
 
-a {
-  color: inherit;
-  text-decoration: underline;
-  text-decoration-thickness: 1px;
-  text-underline-offset: 2px;
-  transition: color var(--duration-fast) var(--ease-standard);
-}
-a:hover {
-  color: var(--accent);
+@layer base {
+  a {
+    color: inherit;
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 2px;
+    transition: color var(--duration-fast) var(--ease-standard);
+  }
+  a:hover {
+    color: var(--accent);
+  }
 }
 
 /* KaTeX follows theme */
