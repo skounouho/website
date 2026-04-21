@@ -57,7 +57,7 @@ export function GlobePin({
       <circle
         cx={x}
         cy={y}
-        r={7.2}
+        r={5.76}
         fill="none"
         stroke="var(--fg-muted)"
         strokeWidth={1.5}
@@ -69,7 +69,7 @@ export function GlobePin({
         data-pin={cluster.id}
         cx={x}
         cy={y}
-        r={4.32}
+        r={3.456}
         fill={fill}
         stroke="var(--bg)"
         strokeWidth={1}
