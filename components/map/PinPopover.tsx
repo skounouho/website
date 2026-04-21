@@ -24,13 +24,11 @@ export function PinPopover({ cluster, onClose }: Props) {
   if (cluster && cluster !== displayed) setDisplayed(cluster);
 
   const isOpen = cluster !== null;
-  const headingId = displayed ? `cluster-${displayed.id}-title` : undefined;
-  const isMulti = (displayed?.pins.length ?? 0) > 1;
 
   return (
     <aside
       role="group"
-      aria-labelledby={headingId}
+      aria-label={displayed?.name}
       aria-hidden={!isOpen}
       onClick={(e) => e.stopPropagation()}
       className={[
@@ -60,35 +58,24 @@ export function PinPopover({ cluster, onClose }: Props) {
       </button>
       <div className="min-h-0 flex-1 overflow-y-auto px-6 py-8 pr-10">
         {displayed ? (
-          <>
-            <h3 id={headingId} className="font-sans text-[22px] font-bold">
-              {displayed.name}
-            </h3>
-            {isMulti ? (
-              <ul className="mt-4 flex flex-col">
-                {displayed.pins.map((pin, i) => (
-                  <li
-                    key={pin.id}
-                    className={i > 0 ? "mt-5 border-t pt-5" : ""}
-                    style={{ borderColor: "var(--border)" }}
-                  >
-                    <EventBlock pin={pin} showName />
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <div className="mt-2">
-                <EventBlock pin={displayed.pins[0]} showName={false} />
-              </div>
-            )}
-          </>
+          <ul className="flex flex-col">
+            {displayed.pins.map((pin, i) => (
+              <li
+                key={pin.id}
+                className={i > 0 ? "mt-5 border-t pt-5" : ""}
+                style={{ borderColor: "var(--border)" }}
+              >
+                <EventBlock pin={pin} />
+              </li>
+            ))}
+          </ul>
         ) : null}
       </div>
     </aside>
   );
 }
 
-function EventBlock({ pin, showName }: { pin: MapPin; showName: boolean }) {
+function EventBlock({ pin }: { pin: MapPin }) {
   const rangeText =
     pin.start && pin.end !== undefined
       ? formatYearMonthRange(pin.start, pin.end ?? null)
@@ -97,9 +84,7 @@ function EventBlock({ pin, showName }: { pin: MapPin; showName: boolean }) {
   return (
     <>
       <div className="flex items-center gap-2">
-        {showName ? (
-          <span className="font-sans text-[15px] font-bold">{pin.name}</span>
-        ) : null}
+        <span className="font-sans text-[17px] font-bold">{pin.name}</span>
         <span
           className="font-sans border px-1.5 py-0.5 text-[10px] uppercase tracking-wider"
           style={{ borderColor: "var(--border)", color: "var(--fg-muted)" }}
