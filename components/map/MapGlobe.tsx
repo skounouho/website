@@ -51,6 +51,7 @@ export function MapGlobe({
     prefersReducedMotion ? "user" : "auto",
   );
   const [openClusterId, setOpenClusterId] = useState<string | null>(null);
+  const [hoveredClusterId, setHoveredClusterId] = useState<string | null>(null);
 
   const clusters = useMemo(() => clusterPins(pins), [pins]);
 
@@ -235,15 +236,22 @@ export function MapGlobe({
           ))}
         </g>
         <g>
-          {projectedClusters.map(({ cluster, x, y }) => (
-            <GlobePin
-              key={cluster.id}
-              cluster={cluster}
-              x={x}
-              y={y}
-              onActivate={onClusterActivate}
-            />
-          ))}
+          {[...projectedClusters]
+            .sort((a, b) => {
+              const aHover = a.cluster.id === hoveredClusterId ? 1 : 0;
+              const bHover = b.cluster.id === hoveredClusterId ? 1 : 0;
+              return aHover - bHover;
+            })
+            .map(({ cluster, x, y }) => (
+              <GlobePin
+                key={cluster.id}
+                cluster={cluster}
+                x={x}
+                y={y}
+                onActivate={onClusterActivate}
+                onHoverChange={setHoveredClusterId}
+              />
+            ))}
         </g>
       </svg>
 

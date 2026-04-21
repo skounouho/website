@@ -8,16 +8,24 @@ interface Props {
   x: number;
   y: number;
   onActivate: (cluster: PinCluster) => void;
+  onHoverChange?: (id: string | null) => void;
 }
 
 /**
  * One pin dot on the globe, representing a cluster of one or more underlying
  * MapPins. A focus ring (visible only on keyboard focus) sits behind the
- * interactive accent-colored circle. Activation (click or Enter/Space)
- * delegates to `onActivate`, which MapGlobe routes into its flyTo/popover
- * logic.
+ * interactive accent-colored circle. Park clusters paint in a muted teal.
+ * Activation (click or Enter/Space) delegates to `onActivate`; hover/focus
+ * notifies MapGlobe via `onHoverChange` so it can sort the pin last and
+ * bring it to the front of the SVG paint order.
  */
-export function GlobePin({ cluster, x, y, onActivate }: Props) {
+export function GlobePin({
+  cluster,
+  x,
+  y,
+  onActivate,
+  onHoverChange,
+}: Props) {
   const handleKeyDown = (e: KeyboardEvent<SVGGElement>) => {
     if (e.key !== "Enter" && e.key !== " ") return;
     e.preventDefault();
@@ -30,6 +38,9 @@ export function GlobePin({ cluster, x, y, onActivate }: Props) {
     onActivate(cluster);
   };
 
+  const isPark = cluster.pins.every((p) => p.kind === "park");
+  const fill = isPark ? "var(--accent-park)" : "var(--accent)";
+
   return (
     <g
       tabIndex={0}
@@ -38,11 +49,15 @@ export function GlobePin({ cluster, x, y, onActivate }: Props) {
       className="group outline-none"
       style={{ cursor: "pointer" }}
       onKeyDown={handleKeyDown}
+      onPointerEnter={() => onHoverChange?.(cluster.id)}
+      onPointerLeave={() => onHoverChange?.(null)}
+      onFocus={() => onHoverChange?.(cluster.id)}
+      onBlur={() => onHoverChange?.(null)}
     >
       <circle
         cx={x}
         cy={y}
-        r={8}
+        r={7.2}
         fill="none"
         stroke="var(--fg-muted)"
         strokeWidth={1.5}
@@ -54,10 +69,10 @@ export function GlobePin({ cluster, x, y, onActivate }: Props) {
         data-pin={cluster.id}
         cx={x}
         cy={y}
-        r={4.8}
-        fill="var(--accent)"
+        r={4.32}
+        fill={fill}
         stroke="var(--bg)"
-        strokeWidth={1.6}
+        strokeWidth={1}
         onClick={handleClick}
       />
     </g>

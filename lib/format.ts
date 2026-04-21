@@ -23,6 +23,7 @@ export function formatYearMonthRange(
   end: string | null,
 ): string {
   const left = formatYearMonth(start);
+  if (end !== null && end === start) return left;
   const right = end === null ? "Present" : formatYearMonth(end);
   return `${left} – ${right}`;
 }
