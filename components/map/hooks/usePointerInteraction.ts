@@ -62,7 +62,7 @@ export function usePointerInteraction(opts: {
   prefersReducedMotion: boolean;
   isPointerOnGlobe: (clientX: number, clientY: number) => boolean;
   setMode: Dispatch<SetStateAction<GlobeMode>>;
-  setOpenPinId: Dispatch<SetStateAction<string | null>>;
+  setOpenClusterId: Dispatch<SetStateAction<string | null>>;
   cancelFly: () => void;
   cancelDrift: () => void;
   startDrift: (vLon: number, vLat: number) => void;
@@ -75,7 +75,7 @@ export function usePointerInteraction(opts: {
     prefersReducedMotion,
     isPointerOnGlobe,
     setMode,
-    setOpenPinId,
+    setOpenClusterId,
     cancelFly,
     cancelDrift,
     startDrift,
@@ -192,7 +192,7 @@ export function usePointerInteraction(opts: {
 
   const onClick: MouseEventHandler<HTMLDivElement> = (e) => {
     if ((e.target as HTMLElement).closest("[data-pin]")) return;
-    setOpenPinId(null);
+    setOpenClusterId(null);
     // If pointerdown started on the globe, this click terminates a drag
     // (possibly released off-sphere); don't treat it as "click outside".
     const startedOnGlobe = pointerDownOnGlobeRef.current;

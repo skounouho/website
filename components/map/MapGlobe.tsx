@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { GeometryCollection, Topology } from "topojson-specification";
 import type { MapPin } from "@/lib/content";
+import { clusterPins, type PinCluster } from "@/lib/cluster";
 import {
   shouldShowStateBorders,
   flyToTarget,
@@ -49,7 +50,9 @@ export function MapGlobe({
   const [mode, setMode] = useState<GlobeMode>(
     prefersReducedMotion ? "user" : "auto",
   );
-  const [openPinId, setOpenPinId] = useState<string | null>(null);
+  const [openClusterId, setOpenClusterId] = useState<string | null>(null);
+
+  const clusters = useMemo(() => clusterPins(pins), [pins]);
 
   const { scheduleRotation, scheduleScale } = useRafBatch(setRotation, setScale);
 
@@ -76,10 +79,10 @@ export function MapGlobe({
     cancelDrift,
   });
 
-  const { countryPaths, statePaths, projectedPins } = useGlobeProjection({
+  const { countryPaths, statePaths, projectedClusters } = useGlobeProjection({
     worldTopo,
     statesTopo,
-    pins,
+    clusters,
     rotation,
     scale,
     initialRotation,
@@ -89,24 +92,25 @@ export function MapGlobe({
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
-      if (e.key === "Escape") setOpenPinId(null);
+      if (e.key === "Escape") setOpenClusterId(null);
     }
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, []);
 
   useGlobeHashRoute({
-    pins,
+    clusters,
     prefersReducedMotion,
     setRotation,
     setScale,
     setMode,
-    setOpenPinId,
+    setOpenClusterId,
     cancelDrift,
     startFlyTo,
   });
 
-  const openPin = projectedPins.find((p) => p.pin.id === openPinId) ?? null;
+  const openCluster =
+    projectedClusters.find((p) => p.cluster.id === openClusterId) ?? null;
 
   const globeCircleRef = useRef<SVGCircleElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -151,7 +155,7 @@ export function MapGlobe({
     prefersReducedMotion,
     isPointerOnGlobe,
     setMode,
-    setOpenPinId,
+    setOpenClusterId,
     cancelFly,
     cancelDrift,
     startDrift,
@@ -159,22 +163,22 @@ export function MapGlobe({
     scheduleScale,
   });
 
-  const onPinActivate = (pin: MapPin) => {
-    if (openPinId === pin.id) {
-      setOpenPinId(null);
+  const onClusterActivate = (cluster: PinCluster) => {
+    if (openClusterId === cluster.id) {
+      setOpenClusterId(null);
       return;
     }
     if (prefersReducedMotion) {
       cancelDrift();
-      const target = flyToTarget(pin);
+      const target = flyToTarget(cluster);
       setRotation(target.rotation);
       setScale(target.scale);
       setMode("user");
-      setOpenPinId(pin.id);
+      setOpenClusterId(cluster.id);
       return;
     }
-    setOpenPinId(null); // close existing popover before flying
-    startFlyTo(pin, () => setOpenPinId(pin.id));
+    setOpenClusterId(null); // close existing popover before flying
+    startFlyTo(cluster, () => setOpenClusterId(cluster.id));
   };
 
   return (
@@ -231,26 +235,22 @@ export function MapGlobe({
           ))}
         </g>
         <g>
-          {projectedPins.map(({ pin, x, y }) => (
+          {projectedClusters.map(({ cluster, x, y }) => (
             <GlobePin
-              key={pin.id}
-              pin={pin}
+              key={cluster.id}
+              cluster={cluster}
               x={x}
               y={y}
-              onActivate={onPinActivate}
+              onActivate={onClusterActivate}
             />
           ))}
         </g>
       </svg>
 
-      {openPin ? (
-        <PinPopover
-          pin={openPin.pin}
-          x={(openPin.x / GLOBE_WIDTH) * 100}
-          y={(openPin.y / GLOBE_HEIGHT) * 100}
-          onClose={() => setOpenPinId(null)}
-        />
-      ) : null}
+      <PinPopover
+        cluster={openCluster?.cluster ?? null}
+        onClose={() => setOpenClusterId(null)}
+      />
     </div>
   );
 }

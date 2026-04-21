@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import type { ExtendedFeatureCollection } from "d3-geo";
 import { feature } from "topojson-client";
-import type { MapPin } from "@/lib/content";
+import type { PinCluster } from "@/lib/cluster";
 import {
   createGlobeProjection,
   pathsFromGeojson,
@@ -12,8 +12,8 @@ import {
 } from "@/lib/projection";
 import type { WorldTopology, StatesTopology } from "../MapGlobe";
 
-export interface ProjectedPin {
-  pin: MapPin;
+export interface ProjectedCluster {
+  cluster: PinCluster;
   x: number;
   y: number;
 }
@@ -21,7 +21,7 @@ export interface ProjectedPin {
 export interface GlobeProjectionResult {
   countryPaths: string[];
   statePaths: string[];
-  projectedPins: ProjectedPin[];
+  projectedClusters: ProjectedCluster[];
 }
 
 /**
@@ -32,7 +32,7 @@ export interface GlobeProjectionResult {
 export function useGlobeProjection(opts: {
   worldTopo: WorldTopology;
   statesTopo: StatesTopology;
-  pins: MapPin[];
+  clusters: PinCluster[];
   rotation: [number, number];
   scale: number;
   initialRotation: [number, number];
@@ -42,7 +42,7 @@ export function useGlobeProjection(opts: {
   const {
     worldTopo,
     statesTopo,
-    pins,
+    clusters,
     rotation,
     scale,
     initialRotation,
@@ -87,21 +87,21 @@ export function useGlobeProjection(opts: {
     const statePaths = shouldShowStateBorders(scale)
       ? pathsFromGeojson(stateFeatures, projection)
       : [];
-    const projectedPins: ProjectedPin[] = pins
-      .map((pin) => {
-        const xy = projection([pin.lon, pin.lat]);
+    const projectedClusters: ProjectedCluster[] = clusters
+      .map((cluster) => {
+        const xy = projection([cluster.lon, cluster.lat]);
         if (!xy) return null;
-        if (!isPinVisible(pin, rotation)) return null;
-        return { pin, x: xy[0], y: xy[1] };
+        if (!isPinVisible(cluster, rotation)) return null;
+        return { cluster, x: xy[0], y: xy[1] };
       })
-      .filter((p): p is ProjectedPin => p !== null);
-    return { countryPaths, statePaths, projectedPins };
+      .filter((p): p is ProjectedCluster => p !== null);
+    return { countryPaths, statePaths, projectedClusters };
   }, [
     rotation,
     scale,
     worldFeatures,
     stateFeatures,
-    pins,
+    clusters,
     initialCountryPaths,
     initialRotation,
     initialScale,

@@ -1,6 +1,5 @@
 import { useEffect, useRef } from "react";
 import type { Dispatch, SetStateAction, RefObject } from "react";
-import type { MapPin } from "@/lib/content";
 import { cubicBezierEase, lerpRotation, lerpScale } from "@/lib/tween";
 import { flyToTarget } from "@/lib/projection";
 import type { GlobeMode } from "./useAutoRotate";
@@ -8,8 +7,14 @@ import type { GlobeMode } from "./useAutoRotate";
 const GLOBE_DURATION_MS = 750;
 const GLOBE_EASE = cubicBezierEase(0.2, 0, 0, 1);
 
+/** Anything with lat/lon — matches both MapPin and PinCluster structurally. */
+export interface FlyTarget {
+  lat: number;
+  lon: number;
+}
+
 export interface FlyTo {
-  startFlyTo: (pin: MapPin, onComplete?: () => void) => void;
+  startFlyTo: (target: FlyTarget, onComplete?: () => void) => void;
   cancelFly: () => void;
 }
 
@@ -31,10 +36,10 @@ export function useFlyTo(opts: {
     }
   };
 
-  const startFlyTo = (pin: MapPin, onComplete?: () => void) => {
+  const startFlyTo = (target_: FlyTarget, onComplete?: () => void) => {
     cancelFly();
     cancelDrift();
-    const target = flyToTarget(pin);
+    const target = flyToTarget(target_);
     const startRotation = rotationRef.current!;
     const startScale = scaleRef.current!;
     const startTime = performance.now();

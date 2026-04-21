@@ -108,3 +108,41 @@
     embarked on a trip to the classic city Rome. There, I visited
     historic sites of civil engineering.
   blog_slugs: []
+
+- id: project-citizen
+  name: Washington, D.C.
+  kind: visited
+  lat: 38.9072
+  lon: -77.0369
+  start: "2022-08"
+  end: "2022-08"
+  description: |
+    Project Citizen — my freshman year orientation program. A first
+    week of college spent across the capital's monuments, museums,
+    and institutions.
+  blog_slugs: []
+
+- id: national-history-day
+  name: College Park, MD
+  kind: visited
+  lat: 38.9897
+  lon: -76.9378
+  start: "2018-06"
+  end: "2022-06"
+  description: |
+    National History Day — a high school history project I wrote
+    for across four years, with national finals hosted at the
+    University of Maryland.
+  blog_slugs: []
+
+- id: duke-uconn-2026
+  name: Washington, D.C.
+  kind: visited
+  lat: 38.8983
+  lon: -77.0209
+  start: "2026-03"
+  end: "2026-03"
+  description: |
+    Duke vs. UConn, March Madness 2026 at Capital One Arena. A
+    tough game to watch.
+  blog_slugs: []

@@ -1,46 +1,90 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import type { MapPin } from "@/lib/content";
+import type { PinCluster } from "@/lib/cluster";
 import { formatYearMonthRange } from "@/lib/format";
 
 interface Props {
-  pin: MapPin;
-  /** Pin x position as a percentage of the container width. */
-  x: number;
-  /** Pin y position as a percentage of the container height. */
-  y: number;
+  /**
+   * Currently-selected cluster, or null when the sidebar should be closed.
+   * Always-mounted: the sidebar stays in the tree so slide/fade transitions
+   * can run in both directions.
+   */
+  cluster: PinCluster | null;
   onClose: () => void;
 }
 
-export function PinPopover({ pin, x, y, onClose }: Props) {
-  // Flip above/below based on vertical position within the map.
-  const placement: "above" | "below" = y < 25 ? "below" : "above";
+export function PinPopover({ cluster, onClose }: Props) {
+  // Preserve the last non-null cluster so content stays visible through the
+  // exit transition. Derive synchronously in render — using an effect would
+  // flash an empty panel on the first open.
+  const [displayed, setDisplayed] = useState<PinCluster | null>(cluster);
+  if (cluster && cluster !== displayed) setDisplayed(cluster);
 
-  const headingId = `pin-${pin.id}-title`;
+  const isOpen = cluster !== null;
+
+  return (
+    <aside
+      role="group"
+      aria-label={displayed?.name}
+      aria-hidden={!isOpen}
+      onClick={(e) => e.stopPropagation()}
+      className={[
+        "fixed right-6 top-1/2 z-10 flex flex-col",
+        "w-[420px] max-w-[calc(100vw-3rem)] max-h-[85vh]",
+        "border rounded-[2px] shadow-sm",
+        "-translate-y-1/2",
+        "transition-[transform,opacity] duration-[280ms] ease-out",
+        "motion-reduce:transition-opacity motion-reduce:duration-[120ms]",
+        isOpen
+          ? "translate-x-0 opacity-100"
+          : "opacity-0 pointer-events-none motion-safe:translate-x-[calc(100%+1.5rem)]",
+      ].join(" ")}
+      style={{
+        background: "var(--bg)",
+        borderColor: "var(--border)",
+      }}
+    >
+      <button
+        type="button"
+        onClick={onClose}
+        aria-label="Close"
+        className="font-sans absolute right-3 top-3 z-10 inline-flex h-7 w-7 items-center justify-center text-lg"
+        style={{ color: "var(--fg-muted)" }}
+      >
+        ×
+      </button>
+      <div className="min-h-0 flex-1 overflow-y-auto px-6 py-8 pr-10">
+        {displayed ? (
+          <ul className="flex flex-col">
+            {displayed.pins.map((pin, i) => (
+              <li
+                key={pin.id}
+                className={i > 0 ? "mt-5 border-t pt-5" : ""}
+                style={{ borderColor: "var(--border)" }}
+              >
+                <EventBlock pin={pin} />
+              </li>
+            ))}
+          </ul>
+        ) : null}
+      </div>
+    </aside>
+  );
+}
+
+function EventBlock({ pin }: { pin: MapPin }) {
   const rangeText =
     pin.start && pin.end !== undefined
       ? formatYearMonthRange(pin.start, pin.end ?? null)
       : null;
 
   return (
-    <div
-      role="group"
-      aria-labelledby={headingId}
-      onClick={(e) => e.stopPropagation()}
-      className="absolute z-10 w-[320px] max-w-[80vw] border p-5 shadow-sm"
-      style={{
-        left: `${x}%`,
-        top: `${y}%`,
-        transform: `translate(-50%, ${placement === "above" ? "-100%" : "0"}) translateY(${placement === "above" ? "-14px" : "14px"})`,
-        background: "var(--bg)",
-        borderColor: "var(--border)",
-      }}
-    >
-      <div className="flex items-center gap-3">
-        <h3 id={headingId} className="font-sans text-[20px] font-bold">
-          {pin.name}
-        </h3>
+    <>
+      <div className="flex items-center gap-2">
+        <span className="font-sans text-[17px] font-bold">{pin.name}</span>
         <span
           className="font-sans border px-1.5 py-0.5 text-[10px] uppercase tracking-wider"
           style={{ borderColor: "var(--border)", color: "var(--fg-muted)" }}
@@ -57,14 +101,14 @@ export function PinPopover({ pin, x, y, onClose }: Props) {
         </div>
       ) : null}
       {pin.description ? (
-        <div className="font-serif mt-3 space-y-2 text-[15px]">
+        <div className="font-serif mt-2 space-y-2 text-[15px]">
           {pin.description.split(/\n{2,}/).map((para, i) => (
             <p key={i}>{para}</p>
           ))}
         </div>
       ) : null}
       {pin.links.length > 0 ? (
-        <ul className="font-serif mt-3 flex flex-col gap-1 text-sm">
+        <ul className="font-serif mt-2 flex flex-col gap-1 text-sm">
           {pin.links.map((l) => (
             <li key={l.url}>
               <a href={l.url} target="_blank" rel="noopener noreferrer">
@@ -75,10 +119,8 @@ export function PinPopover({ pin, x, y, onClose }: Props) {
         </ul>
       ) : null}
       {pin.blog_slugs.length > 0 ? (
-        <div className="mt-4">
-          <h4 className="font-sans text-[16px] font-bold">
-            Related writing
-          </h4>
+        <div className="mt-3">
+          <h4 className="font-sans text-[14px] font-bold">Related writing</h4>
           <ul className="font-serif mt-1 flex flex-col gap-1 text-sm">
             {pin.blog_slugs.map((slug) => (
               <li key={slug}>
@@ -88,15 +130,6 @@ export function PinPopover({ pin, x, y, onClose }: Props) {
           </ul>
         </div>
       ) : null}
-      <button
-        type="button"
-        onClick={onClose}
-        aria-label="Close"
-        className="font-sans absolute right-2 top-2 inline-flex h-6 w-6 items-center justify-center"
-        style={{ color: "var(--fg-muted)" }}
-      >
-        ×
-      </button>
-    </div>
+    </>
   );
 }

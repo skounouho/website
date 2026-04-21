@@ -1,39 +1,40 @@
 "use client";
 
 import type { KeyboardEvent, MouseEvent } from "react";
-import type { MapPin } from "@/lib/content";
+import type { PinCluster } from "@/lib/cluster";
 
 interface Props {
-  pin: MapPin;
+  cluster: PinCluster;
   x: number;
   y: number;
-  onActivate: (pin: MapPin) => void;
+  onActivate: (cluster: PinCluster) => void;
 }
 
 /**
- * One pin on the globe: a focus ring (visible only on keyboard focus) and
- * the interactive accent-colored circle. Activation (click or Enter/Space)
+ * One pin dot on the globe, representing a cluster of one or more underlying
+ * MapPins. A focus ring (visible only on keyboard focus) sits behind the
+ * interactive accent-colored circle. Activation (click or Enter/Space)
  * delegates to `onActivate`, which MapGlobe routes into its flyTo/popover
  * logic.
  */
-export function GlobePin({ pin, x, y, onActivate }: Props) {
+export function GlobePin({ cluster, x, y, onActivate }: Props) {
   const handleKeyDown = (e: KeyboardEvent<SVGGElement>) => {
     if (e.key !== "Enter" && e.key !== " ") return;
     e.preventDefault();
     e.stopPropagation();
-    onActivate(pin);
+    onActivate(cluster);
   };
 
   const handleClick = (e: MouseEvent<SVGCircleElement>) => {
     e.stopPropagation();
-    onActivate(pin);
+    onActivate(cluster);
   };
 
   return (
     <g
       tabIndex={0}
       role="button"
-      aria-label={pin.name}
+      aria-label={cluster.name}
       className="group outline-none"
       style={{ cursor: "pointer" }}
       onKeyDown={handleKeyDown}
@@ -50,7 +51,7 @@ export function GlobePin({ pin, x, y, onActivate }: Props) {
         aria-hidden="true"
       />
       <circle
-        data-pin={pin.id}
+        data-pin={cluster.id}
         cx={x}
         cy={y}
         r={4.8}
