@@ -27,4 +27,8 @@ describe("formatYearMonthRange", () => {
   it("renders an open-ended range with 'Present' when end is null", () => {
     expect(formatYearMonthRange("2024-01", null)).toBe("Jan 2024 – Present");
   });
+
+  it("collapses a same-month range to a single label", () => {
+    expect(formatYearMonthRange("2022-05", "2022-05")).toBe("May 2022");
+  });
 });
