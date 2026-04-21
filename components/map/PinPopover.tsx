@@ -34,13 +34,15 @@ export function PinPopover({ cluster, onClose }: Props) {
       aria-hidden={!isOpen}
       onClick={(e) => e.stopPropagation()}
       className={[
-        "fixed right-0 top-0 bottom-0 z-10 w-[420px] max-w-[90vw]",
-        "border-l shadow-sm",
+        "fixed right-6 top-1/2 z-10 flex flex-col",
+        "w-[420px] max-w-[calc(100vw-3rem)] max-h-[85vh]",
+        "border rounded-[2px] shadow-sm",
+        "-translate-y-1/2",
         "transition-[transform,opacity] duration-[280ms] ease-out",
         "motion-reduce:transition-opacity motion-reduce:duration-[120ms]",
         isOpen
           ? "translate-x-0 opacity-100"
-          : "opacity-0 pointer-events-none motion-safe:translate-x-full",
+          : "opacity-0 pointer-events-none motion-safe:translate-x-[calc(100%+1.5rem)]",
       ].join(" ")}
       style={{
         background: "var(--bg)",
@@ -56,7 +58,7 @@ export function PinPopover({ cluster, onClose }: Props) {
       >
         ×
       </button>
-      <div className="h-full overflow-y-auto px-6 py-8 pr-10">
+      <div className="min-h-0 flex-1 overflow-y-auto px-6 py-8 pr-10">
         {displayed ? (
           <>
             <h3 id={headingId} className="font-sans text-[22px] font-bold">
