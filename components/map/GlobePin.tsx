@@ -11,6 +11,11 @@ interface Props {
   onHoverChange?: (id: string | null) => void;
 }
 
+// Invisible hit target radius. Bigger than the focus ring (6.912) so clicks
+// slightly off the visible dot still register as pin clicks instead of
+// falling through to the globe below (which would close the open popover).
+const HIT_TARGET_RADIUS = 11;
+
 /**
  * One pin dot on the globe, representing a cluster of one or more underlying
  * MapPins. A focus ring (visible only on keyboard focus) sits behind the
@@ -33,7 +38,7 @@ export function GlobePin({
     onActivate(cluster);
   };
 
-  const handleClick = (e: MouseEvent<SVGCircleElement>) => {
+  const handleClick = (e: MouseEvent<SVGGElement>) => {
     e.stopPropagation();
     onActivate(cluster);
   };
@@ -46,8 +51,10 @@ export function GlobePin({
       tabIndex={0}
       role="button"
       aria-label={cluster.name}
+      data-pin={cluster.id}
       className="group outline-none"
       style={{ cursor: "pointer" }}
+      onClick={handleClick}
       onKeyDown={handleKeyDown}
       onPointerEnter={() => onHoverChange?.(cluster.id)}
       onPointerLeave={() => onHoverChange?.(null)}
@@ -62,18 +69,25 @@ export function GlobePin({
         stroke="var(--fg-muted)"
         strokeWidth={1.5}
         vectorEffect="non-scaling-stroke"
+        pointerEvents="none"
         className="opacity-0 group-focus-visible:opacity-100 transition-opacity duration-[var(--duration-fast)]"
         aria-hidden="true"
       />
       <circle
-        data-pin={cluster.id}
         cx={x}
         cy={y}
         r={4.1472}
         fill={fill}
         stroke="var(--bg)"
         strokeWidth={1}
-        onClick={handleClick}
+        pointerEvents="none"
+      />
+      <circle
+        cx={x}
+        cy={y}
+        r={HIT_TARGET_RADIUS}
+        fill="transparent"
+        aria-hidden="true"
       />
     </g>
   );
