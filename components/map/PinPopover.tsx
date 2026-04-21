@@ -1,70 +1,88 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import type { MapPin } from "@/lib/content";
 import type { PinCluster } from "@/lib/cluster";
 import { formatYearMonthRange } from "@/lib/format";
 
 interface Props {
-  cluster: PinCluster;
-  /** Cluster x position as a percentage of the container width. */
-  x: number;
-  /** Cluster y position as a percentage of the container height. */
-  y: number;
+  /**
+   * Currently-selected cluster, or null when the sidebar should be closed.
+   * Always-mounted: the sidebar stays in the tree so slide/fade transitions
+   * can run in both directions.
+   */
+  cluster: PinCluster | null;
   onClose: () => void;
 }
 
-export function PinPopover({ cluster, x, y, onClose }: Props) {
-  const placement: "above" | "below" = y < 25 ? "below" : "above";
-  const headingId = `cluster-${cluster.id}-title`;
-  const isMulti = cluster.pins.length > 1;
+export function PinPopover({ cluster, onClose }: Props) {
+  // Preserve the last non-null cluster so content stays visible through the
+  // exit transition. Derive synchronously in render — using an effect would
+  // flash an empty panel on the first open.
+  const [displayed, setDisplayed] = useState<PinCluster | null>(cluster);
+  if (cluster && cluster !== displayed) setDisplayed(cluster);
+
+  const isOpen = cluster !== null;
+  const headingId = displayed ? `cluster-${displayed.id}-title` : undefined;
+  const isMulti = (displayed?.pins.length ?? 0) > 1;
 
   return (
-    <div
+    <aside
       role="group"
       aria-labelledby={headingId}
+      aria-hidden={!isOpen}
       onClick={(e) => e.stopPropagation()}
-      className="absolute z-10 w-[320px] max-w-[80vw] max-h-[70vh] overflow-y-auto border p-5 shadow-sm"
+      className={[
+        "fixed right-0 top-0 bottom-0 z-10 w-[420px] max-w-[90vw]",
+        "border-l shadow-sm",
+        "transition-[transform,opacity] duration-[280ms] ease-out",
+        "motion-reduce:transition-opacity motion-reduce:duration-[120ms]",
+        isOpen
+          ? "translate-x-0 opacity-100"
+          : "opacity-0 pointer-events-none motion-safe:translate-x-full",
+      ].join(" ")}
       style={{
-        left: `${x}%`,
-        top: `${y}%`,
-        transform: `translate(-50%, ${placement === "above" ? "-100%" : "0"}) translateY(${placement === "above" ? "-14px" : "14px"})`,
         background: "var(--bg)",
         borderColor: "var(--border)",
       }}
     >
-      <h3 id={headingId} className="font-sans text-[20px] font-bold">
-        {cluster.name}
-      </h3>
-
-      {isMulti ? (
-        <ul className="mt-3 flex flex-col">
-          {cluster.pins.map((pin, i) => (
-            <li
-              key={pin.id}
-              className={i > 0 ? "mt-4 border-t pt-4" : ""}
-              style={{ borderColor: "var(--border)" }}
-            >
-              <EventBlock pin={pin} showName />
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <div className="mt-1">
-          <EventBlock pin={cluster.pins[0]} showName={false} />
-        </div>
-      )}
-
       <button
         type="button"
         onClick={onClose}
         aria-label="Close"
-        className="font-sans absolute right-2 top-2 inline-flex h-6 w-6 items-center justify-center"
+        className="font-sans absolute right-3 top-3 z-10 inline-flex h-7 w-7 items-center justify-center text-lg"
         style={{ color: "var(--fg-muted)" }}
       >
         ×
       </button>
-    </div>
+      <div className="h-full overflow-y-auto px-6 py-8 pr-10">
+        {displayed ? (
+          <>
+            <h3 id={headingId} className="font-sans text-[22px] font-bold">
+              {displayed.name}
+            </h3>
+            {isMulti ? (
+              <ul className="mt-4 flex flex-col">
+                {displayed.pins.map((pin, i) => (
+                  <li
+                    key={pin.id}
+                    className={i > 0 ? "mt-5 border-t pt-5" : ""}
+                    style={{ borderColor: "var(--border)" }}
+                  >
+                    <EventBlock pin={pin} showName />
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <div className="mt-2">
+                <EventBlock pin={displayed.pins[0]} showName={false} />
+              </div>
+            )}
+          </>
+        ) : null}
+      </div>
+    </aside>
   );
 }
 

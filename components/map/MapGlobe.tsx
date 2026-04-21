@@ -592,14 +592,10 @@ export function MapGlobe({
         </g>
       </svg>
 
-      {openCluster ? (
-        <PinPopover
-          cluster={openCluster.cluster}
-          x={(openCluster.x / GLOBE_WIDTH) * 100}
-          y={(openCluster.y / GLOBE_HEIGHT) * 100}
-          onClose={() => setOpenClusterId(null)}
-        />
-      ) : null}
+      <PinPopover
+        cluster={openCluster?.cluster ?? null}
+        onClose={() => setOpenClusterId(null)}
+      />
     </div>
   );
 }
