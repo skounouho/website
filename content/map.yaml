@@ -146,3 +146,99 @@
     Duke vs. UConn, March Madness 2026 at Capital One Arena. A
     tough game to watch.
   blog_slugs: []
+
+- id: phoenix
+  name: Phoenix, AZ
+  kind: lived
+  lat: 33.4484
+  lon: -112.0740
+  start: "2014-08"
+  end: "2022-05"
+  description: |
+    Eight years at BASIS Peoria, from fifth through twelfth grade.
+  blog_slugs: []
+
+- id: oxford
+  name: Oxford, UK
+  kind: visited
+  lat: 51.7520
+  lon: -1.2577
+  start: "2023-07"
+  end: "2023-08"
+  description: |
+    Summer study abroad at Oxford.
+  blog_slugs: []
+
+- id: cotonou
+  name: Cotonou, Benin
+  kind: visited
+  lat: 6.3703
+  lon: 2.3912
+  start: "2022-05"
+  end: "2022-05"
+  description: |
+    A visit home — my father's hometown.
+  blog_slugs: []
+
+- id: osaka
+  name: Osaka, Japan
+  kind: visited
+  lat: 34.6937
+  lon: 135.5023
+  description: |
+    My mother's hometown.
+  blog_slugs: []
+
+- id: yosemite
+  name: Yosemite National Park
+  kind: park
+  lat: 37.8651
+  lon: -119.5383
+  description: |
+    Granite walls and waterfalls in the Sierra Nevada.
+  blog_slugs: []
+
+- id: grand-canyon
+  name: Grand Canyon National Park
+  kind: park
+  lat: 36.1069
+  lon: -112.1129
+  description: |
+    The South Rim of the Grand Canyon.
+  blog_slugs: []
+
+- id: zion
+  name: Zion National Park
+  kind: park
+  lat: 37.2982
+  lon: -113.0263
+  description: |
+    Red sandstone canyons in southern Utah.
+  blog_slugs: []
+
+- id: bryce-canyon
+  name: Bryce Canyon National Park
+  kind: park
+  lat: 37.5930
+  lon: -112.1871
+  description: |
+    Amphitheaters of hoodoos above 8,000 feet.
+  blog_slugs: []
+
+- id: joshua-tree
+  name: Joshua Tree National Park
+  kind: park
+  lat: 33.8734
+  lon: -115.9010
+  description: |
+    High desert where the Mojave meets the Colorado.
+  blog_slugs: []
+
+- id: smoky-mountains
+  name: Great Smoky Mountains National Park
+  kind: park
+  lat: 35.6118
+  lon: -83.4895
+  description: |
+    Ridge-and-valley forests along the Tennessee–North Carolina line.
+  blog_slugs: []

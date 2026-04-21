@@ -11,6 +11,7 @@
   --fg-muted: #6b6660;
   --border: #e3ded6;
   --accent: #8a6f4f;
+  --accent-park: #4f7a75;
 
   --font-serif: "Alegreya Variable", Georgia, serif;
   --font-sans: "Lato", system-ui, sans-serif;
@@ -32,6 +33,7 @@
   --fg-muted: #8f8a82;
   --border: #2e2a26;
   --accent: #b8986e;
+  --accent-park: #7ba39e;
 }
 
 @media (prefers-reduced-motion: reduce) {

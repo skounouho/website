@@ -528,67 +528,82 @@ export function MapGlobe({
           ))}
         </g>
         <g>
-          {projectedClusters.map(({ cluster, x, y }) => (
-            <g
-              key={cluster.id}
-              tabIndex={0}
-              role="button"
-              aria-label={cluster.name}
-              className="group outline-none"
-              style={{ cursor: "pointer" }}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" || e.key === " ") {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  (document.querySelector(
-                    `[data-pin="${cluster.id}"]`,
-                  ) as SVGCircleElement | null)?.dispatchEvent(
-                    new MouseEvent("click", { bubbles: true }),
-                  );
-                }
-              }}
-            >
-              <circle
-                cx={x}
-                cy={y}
-                r={8}
-                fill="none"
-                stroke="var(--fg-muted)"
-                strokeWidth={1.5}
-                vectorEffect="non-scaling-stroke"
-                className="opacity-0 group-focus-visible:opacity-100 transition-opacity duration-[var(--duration-fast)]"
-                aria-hidden="true"
-              />
-              <circle
-                data-pin={cluster.id}
-                cx={x}
-                cy={y}
-                r={4.8}
-                fill="var(--accent)"
-                stroke="var(--bg)"
-                strokeWidth={1.6}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  if (openClusterId === cluster.id) {
-                    setOpenClusterId(null);
-                    return;
+          {projectedClusters.map(({ cluster, x, y }) => {
+            const isPark = cluster.pins.every((p) => p.kind === "park");
+            const handlePinClick = (e: React.MouseEvent) => {
+              e.stopPropagation();
+              if (openClusterId === cluster.id) {
+                setOpenClusterId(null);
+                return;
+              }
+              if (prefersReducedMotion) {
+                cancelDrift();
+                const target = flyToTarget(cluster);
+                setRotation(target.rotation);
+                setScale(target.scale);
+                setMode("user");
+                setOpenClusterId(cluster.id);
+                return;
+              }
+              setOpenClusterId(null);
+              startFlyTo(cluster, () => setOpenClusterId(cluster.id));
+            };
+            return (
+              <g
+                key={cluster.id}
+                tabIndex={0}
+                role="button"
+                aria-label={cluster.name}
+                className="group outline-none"
+                style={{ cursor: "pointer" }}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    (document.querySelector(
+                      `[data-pin="${cluster.id}"]`,
+                    ) as SVGElement | null)?.dispatchEvent(
+                      new MouseEvent("click", { bubbles: true }),
+                    );
                   }
-                  if (prefersReducedMotion) {
-                    cancelDrift();
-                    const target = flyToTarget(cluster);
-                    setRotation(target.rotation);
-                    setScale(target.scale);
-                    setMode("user");
-                    setOpenClusterId(cluster.id);
-                    return;
-                  }
-                  // Close any existing popover before flying.
-                  setOpenClusterId(null);
-                  startFlyTo(cluster, () => setOpenClusterId(cluster.id));
                 }}
-              />
-            </g>
-          ))}
+              >
+                <circle
+                  cx={x}
+                  cy={y}
+                  r={8}
+                  fill="none"
+                  stroke="var(--fg-muted)"
+                  strokeWidth={1.5}
+                  vectorEffect="non-scaling-stroke"
+                  className="opacity-0 group-focus-visible:opacity-100 transition-opacity duration-[var(--duration-fast)]"
+                  aria-hidden="true"
+                />
+                {isPark ? (
+                  <polygon
+                    data-pin={cluster.id}
+                    points={`${x},${y - 5.8} ${x - 5},${y + 2.9} ${x + 5},${y + 2.9}`}
+                    fill="var(--accent-park)"
+                    stroke="var(--bg)"
+                    strokeWidth={1.6}
+                    strokeLinejoin="round"
+                    onClick={handlePinClick}
+                  />
+                ) : (
+                  <circle
+                    data-pin={cluster.id}
+                    cx={x}
+                    cy={y}
+                    r={4.8}
+                    fill="var(--accent)"
+                    stroke="var(--bg)"
+                    strokeWidth={1.6}
+                    onClick={handlePinClick}
+                  />
+                )}
+              </g>
+            );
+          })}
         </g>
       </svg>
 

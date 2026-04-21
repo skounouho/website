@@ -143,6 +143,7 @@ export const mapPinKind = z.enum([
   "visited",
   "conference",
   "research",
+  "park",
 ]);
 
 export const mapPinSchema = yearMonthRange({
