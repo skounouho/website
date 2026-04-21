@@ -61,6 +61,7 @@ export function MapGlobe({
     prefersReducedMotion ? "user" : "auto",
   );
   const [openClusterId, setOpenClusterId] = useState<string | null>(null);
+  const [hoveredClusterId, setHoveredClusterId] = useState<string | null>(null);
 
   const clusters = useMemo(() => clusterPins(pins), [pins]);
 
@@ -528,7 +529,13 @@ export function MapGlobe({
           ))}
         </g>
         <g>
-          {projectedClusters.map(({ cluster, x, y }) => {
+          {[...projectedClusters]
+            .sort((a, b) => {
+              const aHover = a.cluster.id === hoveredClusterId ? 1 : 0;
+              const bHover = b.cluster.id === hoveredClusterId ? 1 : 0;
+              return aHover - bHover;
+            })
+            .map(({ cluster, x, y }) => {
             const isPark = cluster.pins.every((p) => p.kind === "park");
             const handlePinClick = (e: React.MouseEvent) => {
               e.stopPropagation();
@@ -556,6 +563,18 @@ export function MapGlobe({
                 aria-label={cluster.name}
                 className="group outline-none"
                 style={{ cursor: "pointer" }}
+                onPointerEnter={() => setHoveredClusterId(cluster.id)}
+                onPointerLeave={() =>
+                  setHoveredClusterId((id) =>
+                    id === cluster.id ? null : id,
+                  )
+                }
+                onFocus={() => setHoveredClusterId(cluster.id)}
+                onBlur={() =>
+                  setHoveredClusterId((id) =>
+                    id === cluster.id ? null : id,
+                  )
+                }
                 onKeyDown={(e) => {
                   if (e.key === "Enter" || e.key === " ") {
                     e.preventDefault();
@@ -571,7 +590,7 @@ export function MapGlobe({
                 <circle
                   cx={x}
                   cy={y}
-                  r={8}
+                  r={7.2}
                   fill="none"
                   stroke="var(--fg-muted)"
                   strokeWidth={1.5}
@@ -579,28 +598,16 @@ export function MapGlobe({
                   className="opacity-0 group-focus-visible:opacity-100 transition-opacity duration-[var(--duration-fast)]"
                   aria-hidden="true"
                 />
-                {isPark ? (
-                  <polygon
-                    data-pin={cluster.id}
-                    points={`${x},${y - 5.8} ${x - 5},${y + 2.9} ${x + 5},${y + 2.9}`}
-                    fill="var(--accent-park)"
-                    stroke="var(--bg)"
-                    strokeWidth={1.6}
-                    strokeLinejoin="round"
-                    onClick={handlePinClick}
-                  />
-                ) : (
-                  <circle
-                    data-pin={cluster.id}
-                    cx={x}
-                    cy={y}
-                    r={4.8}
-                    fill="var(--accent)"
-                    stroke="var(--bg)"
-                    strokeWidth={1.6}
-                    onClick={handlePinClick}
-                  />
-                )}
+                <circle
+                  data-pin={cluster.id}
+                  cx={x}
+                  cy={y}
+                  r={4.32}
+                  fill={isPark ? "var(--accent-park)" : "var(--accent)"}
+                  stroke="var(--bg)"
+                  strokeWidth={1}
+                  onClick={handlePinClick}
+                />
               </g>
             );
           })}
