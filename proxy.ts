@@ -18,8 +18,7 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: [
-    // Gate everything except the unlock route and the assets it needs to render.
-    "/((?!unlock|_next/static|_next/image|favicon\\.ico|icon\\.svg).*)",
-  ],
+  // Gate the blog index and every post (including OG images, so post titles
+  // don't leak via social previews). The rest of the site stays public.
+  matcher: ["/blog", "/blog/:path*"],
 };
