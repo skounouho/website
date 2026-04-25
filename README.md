@@ -1,4 +1,4 @@
-# skounouho.com
+# senou.vercel.app
 
 Senou Kounouho's personal website — blog, resume, and a map of places that have meant something.
 
