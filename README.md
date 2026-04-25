@@ -20,6 +20,15 @@ npm run lint       # eslint
 npm run typecheck  # tsc --noEmit
 ```
 
+## Environment variables
+
+- `NEXT_PUBLIC_SITE_URL` — canonical site URL (used for OG / sitemap / robots).
+  Required at build time when not deployed on Vercel.
+- `SITE_PASSWORD` — optional shared password that gates the entire site.
+  When set, all routes redirect to `/unlock` until the visitor enters the
+  password; a long-lived `site_unlock` cookie keeps them in until the browser
+  clears it. Leave unset locally to skip the gate.
+
 ## Repo layout
 
 - `app/` — App Router pages (home, blog, map)
