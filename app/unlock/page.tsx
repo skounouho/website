@@ -91,6 +91,7 @@ export default async function UnlockPage({
             font-sans text-base bg-transparent
             border-0 border-b border-[var(--border)]
             py-2 px-0 focus:border-[var(--accent)]
+            focus-visible:outline-none
             transition-colors duration-[120ms]
           "
         />
