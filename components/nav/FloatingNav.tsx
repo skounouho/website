@@ -26,6 +26,7 @@ function isActive(pathname: string, href: string): boolean {
 
 export function FloatingNav() {
   const pathname = usePathname();
+  if (pathname === "/unlock") return null;
   return (
     <>
       {/* Desktop: left edge, vertical */}
