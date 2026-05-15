@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getBlogPost, getBlogPosts, getPin } from "@/lib/content";
 import { renderMdx } from "@/lib/content/mdx";
+import { stripTitle } from "@/lib/title";
 import { PostHeader } from "@/components/blog/PostHeader";
 import { PostFooter } from "@/components/blog/PostFooter";
 import { PageContainer } from "@/components/layout/PageContainer";
@@ -18,11 +19,12 @@ export async function generateMetadata(props: {
   const { slug } = await props.params;
   const post = getBlogPost(slug);
   if (!post) return {};
+  const title = stripTitle(post.title);
   return {
-    title: post.title,
+    title,
     description: post.description,
     openGraph: {
-      title: post.title,
+      title,
       description: post.description,
       type: "article",
       publishedTime: post.date,

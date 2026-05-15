@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { BlogPost } from "@/lib/content";
 import { formatPostDate } from "@/lib/format";
+import { renderTitle } from "@/lib/title";
 
 export function PostListRow({ post }: { post: BlogPost }) {
   return (
@@ -24,7 +25,7 @@ export function PostListRow({ post }: { post: BlogPost }) {
           ) : null}
         </span>
         <span className="font-sans text-[20px] transition-colors motion-safe:duration-[var(--duration-fast)] group-hover:text-[var(--accent)]">
-          {post.title}
+          {renderTitle(post.title)}
         </span>
       </Link>
     </li>

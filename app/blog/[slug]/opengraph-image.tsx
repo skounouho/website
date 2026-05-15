@@ -3,6 +3,7 @@ import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { getBlogPost, getBlogPosts } from "@/lib/content";
 import { formatPostDate } from "@/lib/format";
+import { stripTitle } from "@/lib/title";
 
 export const alt = "Blog post";
 export const size = { width: 1200, height: 630 };
@@ -19,7 +20,7 @@ export default async function OG(props: {
 }) {
   const { slug } = await props.params;
   const post = getBlogPost(slug);
-  const title = post?.title ?? "Senou Kounouho";
+  const title = post ? stripTitle(post.title) : "Senou Kounouho";
   const date = post ? formatPostDate(post.date) : "";
 
   // Satori accepts TTF, OTF, and WOFF — NOT woff2. Load the static-weight

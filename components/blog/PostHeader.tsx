@@ -1,5 +1,6 @@
 import type { BlogPost } from "@/lib/content";
 import { formatPostDate } from "@/lib/format";
+import { renderTitle } from "@/lib/title";
 
 export function PostHeader({ post }: { post: BlogPost }) {
   return (
@@ -16,7 +17,7 @@ export function PostHeader({ post }: { post: BlogPost }) {
         className="font-sans mt-3 text-[36px] font-bold leading-[1.15]"
         style={{ color: "var(--fg)" }}
       >
-        {post.title}
+        {renderTitle(post.title)}
       </h1>
     </header>
   );
