@@ -12,13 +12,19 @@ describe("renderTitle", () => {
   it("wraps *...* spans in <em>", () => {
     expect(
       renderToStaticMarkup(<>{renderTitle("*Lost Highway* (1997)")}</>),
-    ).toBe("<em>Lost Highway</em> (1997)");
+    ).toBe("<em>Lost Highway</em>  (1997)");
   });
 
   it("handles multiple spans", () => {
     expect(
       renderToStaticMarkup(<>{renderTitle("on *A* and *B*")}</>),
     ).toBe("on <em>A</em> and <em>B</em>");
+  });
+
+  it("inserts a space before trailing text after an italic span", () => {
+    expect(
+      renderToStaticMarkup(<>{renderTitle("*A*B")}</>),
+    ).toBe("<em>A</em> B");
   });
 });
 

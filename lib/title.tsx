@@ -21,7 +21,10 @@ export function renderTitle(title: string): ReactNode {
     parts.push(<em key={key++}>{match[1]}</em>);
     lastIndex = start + match[0].length;
   }
-  if (lastIndex < title.length) parts.push(title.slice(lastIndex));
+  if (lastIndex < title.length) {
+    const tail = title.slice(lastIndex);
+    parts.push(lastIndex > 0 ? " " + tail : tail);
+  }
   return <Fragment>{parts}</Fragment>;
 }
 
