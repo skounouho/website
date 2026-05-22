@@ -14,6 +14,7 @@ import {
 import { GlobePin } from "./GlobePin";
 import { PinPopover } from "./PinPopover";
 import { usePrefersReducedMotion } from "./hooks/usePrefersReducedMotion";
+import { useCoarsePointer } from "./hooks/useCoarsePointer";
 import { useRafBatch } from "./hooks/useRafBatch";
 import { useAutoRotate, type GlobeMode } from "./hooks/useAutoRotate";
 import { useFlyTo } from "./hooks/useFlyTo";
@@ -45,6 +46,7 @@ export function MapGlobe({
   initialCountryPaths,
 }: MapGlobeProps) {
   const prefersReducedMotion = usePrefersReducedMotion();
+  const coarsePointer = useCoarsePointer();
   const [rotation, setRotation] = useState<[number, number]>(initialRotation);
   const [scale, setScale] = useState<number>(initialScale);
   const [mode, setMode] = useState<GlobeMode>(
@@ -248,6 +250,7 @@ export function MapGlobe({
                 cluster={cluster}
                 x={x}
                 y={y}
+                coarse={coarsePointer}
                 onActivate={onClusterActivate}
                 onHoverChange={setHoveredClusterId}
               />
