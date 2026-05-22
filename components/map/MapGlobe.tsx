@@ -130,7 +130,6 @@ export function MapGlobe({
 
   useGlobeWheel({
     containerRef,
-    scaleRef,
     isPointerOnGlobe,
     cancelFly,
     cancelDrift,

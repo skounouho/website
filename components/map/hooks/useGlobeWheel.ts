@@ -1,26 +1,26 @@
 import { useEffect } from "react";
 import type { Dispatch, SetStateAction, RefObject } from "react";
+import { zoomScale } from "@/lib/projection";
 import type { GlobeMode } from "./useAutoRotate";
 
 /**
  * Non-passive wheel listener for zoom. React's JSX `onWheel` is attached as
  * a passive listener, so `preventDefault()` is silently ignored — we bind
  * imperatively with `{ passive: false }` so it actually suppresses outer
- * scroll. Handler reads the latest committed scale via `scaleRef` so it can
- * subscribe once and never rebind.
+ * scroll. Each event schedules a scale *updater*, not an absolute value, so
+ * the new zoom is always derived from the live scale; deriving it from a
+ * lagged snapshot made continuous zoom jitter back and forth.
  */
 export function useGlobeWheel(opts: {
   containerRef: RefObject<HTMLElement | null>;
-  scaleRef: RefObject<number>;
   isPointerOnGlobe: (clientX: number, clientY: number) => boolean;
   cancelFly: () => void;
   cancelDrift: () => void;
   setMode: Dispatch<SetStateAction<GlobeMode>>;
-  scheduleScale: (next: number) => void;
+  scheduleScale: (update: number | ((prev: number) => number)) => void;
 }): void {
   const {
     containerRef,
-    scaleRef,
     isPointerOnGlobe,
     cancelFly,
     cancelDrift,
@@ -37,12 +37,11 @@ export function useGlobeWheel(opts: {
       cancelFly();
       cancelDrift();
       setMode("user");
-      const factor = Math.exp(-e.deltaY * 0.001);
-      scheduleScale(scaleRef.current! * factor);
+      scheduleScale((prev) => zoomScale(prev, e.deltaY));
     };
     el.addEventListener("wheel", onWheel, { passive: false });
     return () => el.removeEventListener("wheel", onWheel);
-    // Handler reads refs + stable setters, so subscribe once.
+    // Handler uses stable setters, so subscribe once.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 }

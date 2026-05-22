@@ -14,6 +14,20 @@ export const FLY_TO_SCALE = 2.2;
 export const SCALE_MIN = 1;
 export const SCALE_MAX = 4;
 
+// Wheel/trackpad zoom: one event multiplies the scale by e^(-deltaY * this).
+const WHEEL_ZOOM_SENSITIVITY = 0.001;
+
+/**
+ * The globe zoom after one wheel event, clamped to the valid range. Pure, so
+ * the caller can apply it against the *live* scale via a functional state
+ * update — deriving the next zoom from a stale snapshot makes a continuous
+ * zoom jitter back and forth.
+ */
+export function zoomScale(current: number, deltaY: number): number {
+  const next = current * Math.exp(-deltaY * WHEEL_ZOOM_SENSITIVITY);
+  return Math.max(SCALE_MIN, Math.min(SCALE_MAX, next));
+}
+
 export interface GlobeProjectionConfig {
   width: number;
   height: number;
