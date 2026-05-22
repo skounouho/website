@@ -251,6 +251,7 @@ export function MapGlobe({
                 x={x}
                 y={y}
                 coarse={coarsePointer}
+                scale={scale}
                 onActivate={onClusterActivate}
                 onHoverChange={setHoveredClusterId}
               />
