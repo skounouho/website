@@ -5,9 +5,12 @@ import {
   isPinVisible,
   flyToTarget,
   shouldShowStateBorders,
+  zoomScale,
   GLOBE_WIDTH,
   GLOBE_HEIGHT,
   GLOBE_BASE_RADIUS,
+  SCALE_MIN,
+  SCALE_MAX,
 } from "@/lib/projection";
 import type { ExtendedFeatureCollection } from "d3-geo";
 
@@ -124,6 +127,38 @@ describe("shouldShowStateBorders", () => {
   it("is true at and above the threshold", () => {
     expect(shouldShowStateBorders(2.5)).toBe(true);
     expect(shouldShowStateBorders(4)).toBe(true);
+  });
+});
+
+describe("zoomScale", () => {
+  it("zooms in (negative deltaY) without ever decreasing scale", () => {
+    for (let s = SCALE_MIN; s <= SCALE_MAX; s += 0.137) {
+      expect(zoomScale(s, -50)).toBeGreaterThanOrEqual(s);
+    }
+  });
+
+  it("zooms out (positive deltaY) without ever increasing scale", () => {
+    for (let s = SCALE_MIN; s <= SCALE_MAX; s += 0.137) {
+      expect(zoomScale(s, 50)).toBeLessThanOrEqual(s);
+    }
+  });
+
+  it("clamps to the [SCALE_MIN, SCALE_MAX] range", () => {
+    expect(zoomScale(SCALE_MAX, -10000)).toBe(SCALE_MAX);
+    expect(zoomScale(SCALE_MIN, 10000)).toBe(SCALE_MIN);
+  });
+
+  it("stays monotonic across a continuous zoom-in built on live results", () => {
+    // Mirrors a functional setState: every wheel event multiplies the actual
+    // current scale, never a stale snapshot — so the zoom only ever climbs.
+    let s = SCALE_MIN;
+    let prev = s;
+    for (let i = 0; i < 60; i++) {
+      s = zoomScale(s, -40);
+      expect(s).toBeGreaterThanOrEqual(prev);
+      prev = s;
+    }
+    expect(s).toBe(SCALE_MAX);
   });
 });
 

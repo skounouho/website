@@ -4,6 +4,7 @@ import { MdxLink } from "./Link";
 import { MdxPre, MdxCode } from "./Code";
 import { MdxBlockquote } from "./Blockquote";
 import { PullQuote } from "./PullQuote";
+import { Dialogue, Line } from "./Dialogue";
 
 export const mdxComponents: MDXComponents = {
   img: MdxImage as MDXComponents["img"],
@@ -12,4 +13,6 @@ export const mdxComponents: MDXComponents = {
   code: MdxCode as MDXComponents["code"],
   blockquote: MdxBlockquote as MDXComponents["blockquote"],
   PullQuote,
+  Dialogue,
+  Line,
 };
