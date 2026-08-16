@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { buildShareUrl } from "@/lib/auth/share-link";
 import { getBlogPost, getBlogPosts, getPin } from "@/lib/content";
 import { renderMdx } from "@/lib/content/mdx";
 import { stripTitle } from "@/lib/title";
@@ -49,7 +50,7 @@ export default async function BlogPostPage(props: {
       <article>
         <PostHeader post={post} />
         <div className="prose-site">{renderMdx(post.body)}</div>
-        <PostFooter post={post} places={places} />
+        <PostFooter post={post} places={places} shareUrl={buildShareUrl(slug)} />
       </article>
     </PageContainer>
   );

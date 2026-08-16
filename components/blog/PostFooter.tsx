@@ -1,12 +1,15 @@
 import Link from "next/link";
 import type { BlogPost, MapPin } from "@/lib/content";
+import { ShareLink } from "./ShareLink";
 
 export function PostFooter({
   post,
   places,
+  shareUrl,
 }: {
   post: BlogPost;
   places: MapPin[];
+  shareUrl: string | null;
 }) {
   return (
     <footer className="mt-[var(--space-section)] border-t pt-[var(--space-block)]" style={{ borderColor: "var(--border)" }}>
@@ -42,9 +45,12 @@ export function PostFooter({
         </div>
       ) : null}
 
-      <Link href="/blog" className="font-sans text-sm">
-        ← Back to writing
-      </Link>
+      <div className="flex items-start justify-between gap-6">
+        <Link href="/blog" className="font-sans text-sm">
+          ← Back to writing
+        </Link>
+        {shareUrl ? <ShareLink url={shareUrl} /> : null}
+      </div>
     </footer>
   );
 }
