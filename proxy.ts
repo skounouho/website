@@ -1,5 +1,11 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { UNLOCK_COOKIE_NAME, verifyUnlockToken } from "@/lib/auth/site-gate";
+import {
+  SHARE_PARAM,
+  UNLOCK_COOKIE_NAME,
+  shareableSlug,
+  verifyShareToken,
+  verifyUnlockToken,
+} from "@/lib/auth/site-gate";
 
 export function proxy(request: NextRequest) {
   const password = process.env.SITE_PASSWORD;
@@ -11,6 +17,18 @@ export function proxy(request: NextRequest) {
   if (verifyUnlockToken(token, password)) return NextResponse.next();
 
   const url = request.nextUrl;
+
+  // A share link admits its own post and nothing else. Deliberately grants no
+  // cookie: access lasts exactly as long as the token stays in the URL.
+  const shareSecret = process.env.SITE_SHARE_SECRET;
+  const slug = shareableSlug(url.pathname);
+  if (shareSecret && slug) {
+    const shareToken = url.searchParams.get(SHARE_PARAM);
+    if (verifyShareToken(shareToken ?? undefined, slug, shareSecret)) {
+      return NextResponse.next();
+    }
+  }
+
   const next = url.pathname + url.search;
   const unlock = new URL("/unlock", request.url);
   if (next && next !== "/") unlock.searchParams.set("next", next);
