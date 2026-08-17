@@ -4,7 +4,7 @@ import { blogFrontmatterSchema, type BlogPost } from "./schemas";
 import { parseMdx } from "./parse-mdx";
 import { ContentParseError } from "./parse-yaml";
 
-const FILENAME_RE = /^(\d{4}-\d{2}-\d{2})-([a-z0-9]+(?:-[a-z0-9]+)*)\.mdx$/;
+const FILENAME_RE = /^(\d{4}-\d{2}-\d{2})-([a-z0-9]+(?:-[a-z0-9]+)*)\.md$/;
 
 export interface LoadBlogOptions {
   includeDrafts: boolean;
@@ -18,7 +18,7 @@ export function loadBlogPosts(
 
   const entries = fs
     .readdirSync(dir)
-    .filter((n) => n.endsWith(".mdx"))
+    .filter((n) => n.endsWith(".md"))
     .sort();
 
   const posts: BlogPost[] = [];
@@ -30,7 +30,7 @@ export function loadBlogPosts(
     if (!match) {
       throw new ContentParseError(
         abs,
-        "blog filename must match YYYY-MM-DD-<slug>.mdx",
+        "blog filename must match YYYY-MM-DD-<slug>.md",
       );
     }
     const [, filenameDate, slug] = match;
