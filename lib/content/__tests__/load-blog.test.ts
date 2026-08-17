@@ -6,7 +6,7 @@ const fx = (name: string) =>
   path.join(__dirname, "..", "__fixtures__", name);
 
 describe("loadBlogPosts", () => {
-  it("loads .mdx files, derives slug, sorts newest first", () => {
+  it("loads .md files, derives slug, sorts newest first", () => {
     const posts = loadBlogPosts(fx("blog-valid"), { includeDrafts: true });
     expect(posts.map((p) => p.slug)).toEqual(["world", "hello"]);
     expect(posts[0].title).toBe("World");

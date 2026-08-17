@@ -19,7 +19,7 @@ export function contentPaths(root?: string): ContentPaths {
     root: r,
     blog: path.join(r, "blog"),
     map: path.join(r, "map.yaml"),
-    about: path.join(r, "about.mdx"),
+    about: path.join(r, "about.md"),
     resume: {
       work: path.join(r, "resume", "work.yaml"),
       education: path.join(r, "resume", "education.yaml"),
